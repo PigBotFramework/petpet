@@ -94,1396 +94,1118 @@ def load_image(path):
 class petpet(PBF):
     def __enter__(self):
         return [
-            RegCmd(
-                name = "摸 ",
-                usage = "摸 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@petpet",
-                description = "生成摸头像的表情包",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "滚 ",
-                usage = "滚 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@roll",
-                description = "滚某个人的头像",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "小天使 ",
-                usage = "小天使 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@littleangel",
-                description = "生成小天使图片",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "警察 ",
-                usage = "警察 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@police1",
-                description = "出警！",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "兑换卷 ",
-                usage = "兑换卷 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@coupon",
-                description = "XX陪睡兑换卷！",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "听音乐 ",
-                usage = "听音乐 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@listen_music",
-                description = "听音乐！",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "扔 ",
-                usage = "扔 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@throw_gif",
-                description = "扔某人的头像",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "吃 ",
-                usage = "吃 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@eat",
-                description = "吃掉它！",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "我朋友说 ",
-                usage = "我朋友说 <QQ号或@对方> <说的内容>",
-                permission = "anyone",
-                function = "petpet@my_friend",
-                description = "我有个朋友说...",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "假冒伪劣 ",
-                usage = "假冒伪劣 <昵称> <说的内容> <头像>",
-                permission = "anyone",
-                function = "petpet@make_dialog_picture",
-                description = "生成对话图片",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "捶 ",
-                usage = "捶 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@thump",
-                description = "捶某人的头像",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "亲 ",
-                usage = "亲 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@kiss",
-                description = "亲Ta！",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "贴贴 ",
-                usage = "贴贴 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@rub",
-                description = "贴贴对方！",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "万能表情 ",
-                usage = "万能表情 <QQ号或@对方> <附加文字>",
-                permission = "anyone",
-                function = "petpet@universal",
-                description = "万能表情",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "顶 ",
-                usage = "顶 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@play",
-                description = "顶",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "拍 ",
-                usage = "拍 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@pat",
-                description = "拍",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "撕 ",
-                usage = "撕 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@rip",
-                description = "撕",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "爬 ",
-                usage = "爬 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@crawl",
-                description = "爬",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "精神支柱 ",
-                usage = "精神支柱 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@support",
-                description = "精神支柱",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "一直 ",
-                usage = "一直 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@always",
-                description = "一直",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "加载中 ",
-                usage = "加载中 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@loading",
-                description = "加载中",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "转 ",
-                usage = "转 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@turn",
-                description = "转",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "不要靠近 ",
-                usage = "不要靠近 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@dont_touch",
-                description = "不要靠近",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "一样 ",
-                usage = "一样 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@alike",
-                description = "一样",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "玩游戏 ",
-                usage = "玩游戏 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@play_game",
-                description = "玩游戏",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "膜 ",
-                usage = "膜 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@worship",
-                description = "膜",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "啃 ",
-                usage = "啃 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@bite",
-                description = "啃",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "出警 ",
-                usage = "出警 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@police",
-                description = "出警",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "问问 ",
-                usage = "问问 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@ask",
-                description = "问问",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "舔 ",
-                usage = "舔 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@prpr",
-                description = "舔",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "搓 ",
-                usage = "搓 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@twist",
-                description = "搓",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "墙纸 ",
-                usage = "墙纸 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@wallpaper",
-                description = "墙纸",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "交个朋友 ",
-                usage = "交个朋友 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@make_friend",
-                description = "交个朋友",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "继续干活 ",
-                usage = "继续干活 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@back_to_work",
-                description = "继续干活",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "完美 ",
-                usage = "完美 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@perfect",
-                description = "完美",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "关注 ",
-                usage = "关注 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@follow",
-                description = "关注",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "这像画吗 ",
-                usage = "这像画吗 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@paint",
-                description = "这像画吗",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "震惊 ",
-                usage = "震惊 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@shock",
-                description = "震惊",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "典中典 ",
-                usage = "典中典 <QQ号或@对方> <附加文字>",
-                permission = "anyone",
-                function = "petpet@dianzhongdian",
-                description = "典中典",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "哈哈镜 ",
-                usage = "哈哈镜 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@funny_mirror",
-                description = "哈哈镜",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "永远爱你 ",
-                usage = "永远爱你 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@love_you",
-                description = "永远爱你",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "对称 ",
-                usage = "对称 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@symmetric",
-                description = "对称",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "安全感 ",
-                usage = "安全感 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@safe_sense",
-                description = "安全感",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "永远喜欢 ",
-                usage = "永远喜欢 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@always_like",
-                description = "永远喜欢",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "采访 ",
-                usage = "采访 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@interview",
-                description = "采访",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "打拳 ",
-                usage = "打拳 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@punch",
-                description = "打拳",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "群青 ",
-                usage = "群青 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@ cyan",
-                description = "群青",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "捣 ",
-                usage = "捣 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@pound",
-                description = "捣",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "需要 ",
-                usage = "需要 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@need",
-                description = "需要",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "捂脸 ",
-                usage = "捂脸 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@cover_face",
-                description = "捂脸",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "敲 ",
-                usage = "敲 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@knock",
-                description = "敲",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "垃圾 ",
-                usage = "垃圾 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@garbage",
-                description = "垃圾",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "为什么@我 ",
-                usage = "为什么@我 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@whyatme",
-                description = "为什么@我",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "像样的亲亲 ",
-                usage = "像样的亲亲 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@decent_kiss",
-                description = "像样的亲亲",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "啾啾 ",
-                usage = "啾啾 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@jiujiu",
-                description = "啾啾",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "吸 ",
-                usage = "吸 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@suck",
-                description = "吸",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "锤 ",
-                usage = "锤 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@hammer",
-                description = "锤",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "紧贴 ",
-                usage = "紧贴 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@tightly",
-                description = "紧贴",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "注意力涣散 ",
-                usage = "注意力涣散 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@distracted",
-                description = "注意力涣散",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "猪比喜欢 ",
-                usage = "猪比喜欢 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@anyasuki",
-                description = "阿尼亚喜欢",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "想什么 ",
-                usage = "想什么 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@thinkwhat",
-                description = "想什么",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "远离 ",
-                usage = "远离 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@keepaway",
-                description = "远离",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "结婚申请 ",
-                usage = "结婚申请 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@marriage",
-                description = "结婚申请",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "救命啊 ",
-                usage = "救命啊 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@repeat",
-                description = "重复 救命啊！",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "小画家 ",
-                usage = "小画家 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@painter",
-                description = "小画家",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "鲁迅说 ",
-                usage = "鲁迅说 <内容>",
-                permission = "anyone",
-                function = "petpet@luxunsay",
-                description = "鲁迅说过？",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "诺基亚 ",
-                usage = "诺基亚 <内容>",
-                permission = "anyone",
-                function = "petpet@nokia",
-                description = "有内鬼，停止交易",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "喜报 ",
-                usage = "喜报 <内容>",
-                permission = "anyone",
-                function = "petpet@goodnews",
-                description = "喜报",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "悲报 ",
-                usage = "悲报 <内容>",
-                permission = "anyone",
-                function = "petpet@badnews",
-                description = "悲报",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "记仇 ",
-                usage = "记仇 <内容>",
-                permission = "anyone",
-                function = "petpet@holdgrudge",
-                description = "这仇我记下了...",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "狂爱 ",
-                usage = "狂爱 <内容>",
-                permission = "anyone",
-                function = "petpet@fanatic",
-                description = "狂粉",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "低语 ",
-                usage = "低语 <内容>",
-                permission = "anyone",
-                function = "petpet@murmur",
-                description = "低语",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "别说了 ",
-                usage = "别说了 <内容>",
-                permission = "anyone",
-                function = "petpet@shutup",
-                description = "别说了...",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "一巴掌 ",
-                usage = "一巴掌 <内容>",
-                permission = "anyone",
-                function = "petpet@slap",
-                description = "一巴掌...",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "坐牢 ",
-                usage = "坐牢 <内容>",
-                permission = "anyone",
-                function = "petpet@imprison",
-                description = "坐牢...",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "滚屏 ",
-                usage = "滚屏 <内容>",
-                permission = "anyone",
-                function = "petpet@scroll",
-                description = "滚屏...",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "情商 ",
-                usage = "情商 <低情商内容> <高情商内容>",
-                permission = "anyone",
-                function = "petpet@high_EQ",
-                description = "情商姐",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "吴京 ",
-                usage = "吴京 <吴京内容> <中国内容>",
-                permission = "anyone",
-                function = "petpet@wujing",
-                description = "吴京xx中国xx",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "口号 ",
-                usage = "口号 <内容，至少6条，空格间隔>",
-                permission = "anyone",
-                function = "petpet@slogan",
-                description = "口号",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "起来了 ",
-                usage = "起来了 <内容>",
-                permission = "anyone",
-                function = "petpet@wakeup",
-                description = "起来了",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "举牌 ",
-                usage = "举牌 <内容>",
-                permission = "anyone",
-                function = "petpet@raisesign",
-                description = "举牌子",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "可达鸭 ",
-                usage = "可达鸭 <内容1> <内容2>",
-                permission = "anyone",
-                function = "petpet@psyduck",
-                description = "可达鸭",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "刮刮乐 ",
-                usage = "刮刮乐 <内容>",
-                permission = "anyone",
-                function = "petpet@scratchoff",
-                description = "刮刮乐",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "升天 ",
-                usage = "升天 <内容>",
-                permission = "anyone",
-                function = "petpet@ascension",
-                description = "升天",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "快跑 ",
-                usage = "快跑 <内容>",
-                permission = "anyone",
-                function = "petpet@run",
-                description = "口号",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "流星 ",
-                usage = "流星 <内容>",
-                permission = "anyone",
-                function = "petpet@meteor",
-                description = "流星",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "许愿失败 ",
-                usage = "许愿失败 <内容>",
-                permission = "anyone",
-                function = "petpet@wish_fail",
-                description = "许愿失败",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "整点薯条 ",
-                usage = "整点薯条 <内容，四个参数，空格隔开>",
-                permission = "anyone",
-                function = "petpet@findchips",
-                description = "整点薯条",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "大鸭鸭举牌 ",
-                usage = "大鸭鸭举牌 <内容>",
-                permission = "anyone",
-                function = "petpet@bronya_holdsign",
-                description = "大鸭鸭举牌",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "pornhub ",
-                usage = "pornhub <内容1> <内容2>",
-                permission = "anyone",
-                function = "petpet@pornhub",
-                description = "pornhub",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "youtube ",
-                usage = "youtube <内容1> <内容2>",
-                permission = "anyone",
-                function = "petpet@youtube",
-                description = "youtube",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "google ",
-                usage = "google <内容>",
-                permission = "anyone",
-                function = "petpet@google",
-                description = "google",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "5000兆 ",
-                usage = "5000兆 <内容1> <内容2>",
-                permission = "anyone",
-                function = "petpet@fivethousand_choyen",
-                description = "5000兆",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "douyin ",
-                usage = "douyin <内容>",
-                permission = "anyone",
-                function = "petpet@douyin",
-                description = "douyin",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "不喊我 ",
-                usage = "不喊我 <内容>",
-                permission = "anyone",
-                function = "petpet@not_call_me",
-                description = "5000兆",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "王境泽",
-                usage = "王境泽 <台词，空格间隔>",
-                permission = "anyone",
-                function = "petpet@wangjingze",
-                description = "wangjingze",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "为所欲为",
-                usage = "为所欲为 <台词，空格间隔>",
-                permission = "anyone",
-                function = "petpet@weisuoyuwei",
-                description = "weisuoyuwei",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "馋身子",
-                usage = "馋身子 <台词，空格间隔>",
-                permission = "anyone",
-                function = "petpet@chanshenzi",
-                description = "馋身子",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "切格瓦拉",
-                usage = "切格瓦拉 <台词，空格间隔>",
-                permission = "anyone",
-                function = "petpet@qiegewala",
-                description = "切格瓦拉",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "谁反对",
-                usage = "谁反对 <台词，空格间隔>",
-                permission = "anyone",
-                function = "petpet@shuifandui",
-                description = "谁反对",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "曾小贤",
-                usage = "曾小贤 <台词，空格间隔>",
-                permission = "anyone",
-                function = "petpet@zengxiaoxian",
-                description = "曾小贤",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "压力大爷",
-                usage = "压力大爷 <台词，空格间隔>",
-                permission = "anyone",
-                function = "petpet@yalidaye",
-                description = "压力大爷",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "你好骚啊",
-                usage = "你好骚啊 <台词，空格间隔>",
-                permission = "anyone",
-                function = "petpet@nihaosaoa",
-                description = "你好骚啊",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "食屎啦你",
-                usage = "食屎啦你 <台词，空格间隔>",
-                permission = "anyone",
-                function = "petpet@shishilani",
-                description = "食屎啦你",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "五年怎么过的",
-                usage = "五年怎么过的 <台词，空格间隔>",
-                permission = "anyone",
-                function = "petpet@wunian",
-                description = "五年怎么过的",
-                mode = "文字表情",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "防诱拐 ",
-                usage = "防诱拐 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@anti_kidnap",
-                description = "防诱拐",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "字符画 ",
-                usage = "字符画 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@charpic",
-                description = "字符画",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "我老婆 ",
-                usage = "我老婆 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@mywife",
-                description = "我老婆",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "胡桃平板 ",
-                usage = "胡桃平板 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@walnutpad",
-                description = "胡桃平板",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "胡桃放大 ",
-                usage = "胡桃放大 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@walnut_zoom",
-                description = "胡桃放大",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "敲黑板 ",
-                usage = "敲黑板 <QQ号或@对方> <附加内容>",
-                permission = "anyone",
-                function = "petpet@teach",
-                description = "敲黑板",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "上瘾 ",
-                usage = "上瘾 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@addition",
-                description = "上瘾",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "手枪 ",
-                usage = "手枪 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@gun",
-                description = "手枪",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "高血压 ",
-                usage = "高血压 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@blood_pressure",
-                description = "高血压",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "看书 ",
-                usage = "看书 <QQ号或@对方>[ <附加内容>]",
-                permission = "anyone",
-                function = "petpet@read_book",
-                description = "看书",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "遇到困难请拨打 ",
-                usage = "遇到困难请拨打 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@call_110",
-                description = "遇到困难请拨打",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "迷惑 ",
-                usage = "迷惑 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@confuse",
-                description = "迷惑",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "打穿 ",
-                usage = "打穿 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@hit_screen",
-                description = "打穿",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "击剑 ",
-                usage = "击剑 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@fencing",
-                description = "击剑",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "抱大腿 ",
-                usage = "抱大腿 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@hug_leg",
-                description = "抱大腿",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "唐可可举牌 ",
-                usage = "唐可可举牌 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@tankuku_holdsign",
-                description = "唐可可举牌",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "无响应 ",
-                usage = "无响应 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@no_response",
-                description = "无响应",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "抱紧 ",
-                usage = "抱紧 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@hold_tight",
-                description = "抱紧",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "看扁 ",
-                usage = "看扁 <QQ号或@对方>[ <附加内容，文字内容和拉扁比例>]",
-                permission = "anyone",
-                function = "petpet@look_flat",
-                description = "看扁",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "看图标 ",
-                usage = "看图标 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@look_this_icon",
-                description = "看图标",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "舰长 ",
-                usage = "舰长 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@captain",
-                description = "舰长",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "急急国王 ",
-                usage = "急急国王 <QQ号或@对方>[ <附加内容>]",
-                permission = "anyone",
-                function = "petpet@jiji_king",
-                description = "急急国王",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "不文明 ",
-                usage = "不文明 <QQ号或@对方>[ <附加内容>]",
-                permission = "anyone",
-                function = "petpet@incivilization",
-                description = "不文明",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "一起 ",
-                usage = "一起 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@together",
-                description = "一起",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "波纹 ",
-                usage = "波纹 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@wave",
-                description = "波纹",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "诈尸 ",
-                usage = "诈尸 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@rise_dead",
-                description = "诈尸",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "卡比锤 ",
-                usage = "卡比锤 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@kirby_hammer",
-                description = "卡比锤",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "木鱼 ",
-                usage = "木鱼 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@wooden_fish",
-                description = "木鱼",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "凯露指 ",
-                usage = "凯露指 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@karyl_point",
-                description = "凯露指",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "踢球 ",
-                usage = "踢球 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@kick_ball",
-                description = "踢球",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "砸 ",
-                usage = "砸 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@smash",
-                description = "砸",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "波奇手稿 ",
-                usage = "波奇手稿 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@bocchi_draft",
-                description = "波奇手稿",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "坐得住 ",
-                usage = "坐得住 <QQ号或@对方>",
-                permission = "anyone",
-                function = "petpet@sit_still",
-                description = "坐得住",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            ),
-            RegCmd(
-                name = "偷学 ",
-                usage = "偷学 <QQ号或@对方>[ <附加内容>]",
-                permission = "anyone",
-                function = "petpet@learn",
-                description = "偷学",
-                mode = "表  情  包",
-                hidden = 2,
-                type = "command"
-            )
+    @RegCmd(
+        name = "摸 ",
+        usage = "摸 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@petpet",
+        description = "生成摸头像的表情包",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "滚 ",
+        usage = "滚 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@roll",
+        description = "滚某个人的头像",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "小天使 ",
+        usage = "小天使 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@littleangel",
+        description = "生成小天使图片",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "警察 ",
+        usage = "警察 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@police1",
+        description = "出警！",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "兑换卷 ",
+        usage = "兑换卷 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@coupon",
+        description = "XX陪睡兑换卷！",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "听音乐 ",
+        usage = "听音乐 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@listen_music",
+        description = "听音乐！",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "扔 ",
+        usage = "扔 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@throw_gif",
+        description = "扔某人的头像",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "吃 ",
+        usage = "吃 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@eat",
+        description = "吃掉它！",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "我朋友说 ",
+        usage = "我朋友说 <QQ号或@对方> <说的内容>",
+        permission = "anyone",
+        function = "petpet@my_friend",
+        description = "我有个朋友说...",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "假冒伪劣 ",
+        usage = "假冒伪劣 <昵称> <说的内容> <头像>",
+        permission = "anyone",
+        function = "petpet@make_dialog_picture",
+        description = "生成对话图片",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "捶 ",
+        usage = "捶 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@thump",
+        description = "捶某人的头像",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "亲 ",
+        usage = "亲 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@kiss",
+        description = "亲Ta！",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "贴贴 ",
+        usage = "贴贴 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@rub",
+        description = "贴贴对方！",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "万能表情 ",
+        usage = "万能表情 <QQ号或@对方> <附加文字>",
+        permission = "anyone",
+        function = "petpet@universal",
+        description = "万能表情",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "顶 ",
+        usage = "顶 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@play",
+        description = "顶",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "拍 ",
+        usage = "拍 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@pat",
+        description = "拍",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "撕 ",
+        usage = "撕 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@rip",
+        description = "撕",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "爬 ",
+        usage = "爬 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@crawl",
+        description = "爬",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "精神支柱 ",
+        usage = "精神支柱 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@support",
+        description = "精神支柱",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "一直 ",
+        usage = "一直 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@always",
+        description = "一直",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "加载中 ",
+        usage = "加载中 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@loading",
+        description = "加载中",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "转 ",
+        usage = "转 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@turn",
+        description = "转",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "不要靠近 ",
+        usage = "不要靠近 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@dont_touch",
+        description = "不要靠近",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "一样 ",
+        usage = "一样 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@alike",
+        description = "一样",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "玩游戏 ",
+        usage = "玩游戏 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@play_game",
+        description = "玩游戏",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "膜 ",
+        usage = "膜 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@worship",
+        description = "膜",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "啃 ",
+        usage = "啃 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@bite",
+        description = "啃",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "出警 ",
+        usage = "出警 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@police",
+        description = "出警",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "问问 ",
+        usage = "问问 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@ask",
+        description = "问问",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "舔 ",
+        usage = "舔 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@prpr",
+        description = "舔",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "搓 ",
+        usage = "搓 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@twist",
+        description = "搓",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "墙纸 ",
+        usage = "墙纸 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@wallpaper",
+        description = "墙纸",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "交个朋友 ",
+        usage = "交个朋友 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@make_friend",
+        description = "交个朋友",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "继续干活 ",
+        usage = "继续干活 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@back_to_work",
+        description = "继续干活",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "完美 ",
+        usage = "完美 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@perfect",
+        description = "完美",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "关注 ",
+        usage = "关注 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@follow",
+        description = "关注",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "这像画吗 ",
+        usage = "这像画吗 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@paint",
+        description = "这像画吗",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "震惊 ",
+        usage = "震惊 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@shock",
+        description = "震惊",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "典中典 ",
+        usage = "典中典 <QQ号或@对方> <附加文字>",
+        permission = "anyone",
+        function = "petpet@dianzhongdian",
+        description = "典中典",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "哈哈镜 ",
+        usage = "哈哈镜 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@funny_mirror",
+        description = "哈哈镜",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "永远爱你 ",
+        usage = "永远爱你 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@love_you",
+        description = "永远爱你",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "对称 ",
+        usage = "对称 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@symmetric",
+        description = "对称",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "安全感 ",
+        usage = "安全感 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@safe_sense",
+        description = "安全感",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "永远喜欢 ",
+        usage = "永远喜欢 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@always_like",
+        description = "永远喜欢",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "采访 ",
+        usage = "采访 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@interview",
+        description = "采访",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "打拳 ",
+        usage = "打拳 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@punch",
+        description = "打拳",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "群青 ",
+        usage = "群青 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@ cyan",
+        description = "群青",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "捣 ",
+        usage = "捣 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@pound",
+        description = "捣",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "需要 ",
+        usage = "需要 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@need",
+        description = "需要",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "捂脸 ",
+        usage = "捂脸 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@cover_face",
+        description = "捂脸",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "敲 ",
+        usage = "敲 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@knock",
+        description = "敲",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "垃圾 ",
+        usage = "垃圾 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@garbage",
+        description = "垃圾",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "为什么@我 ",
+        usage = "为什么@我 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@whyatme",
+        description = "为什么@我",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "像样的亲亲 ",
+        usage = "像样的亲亲 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@decent_kiss",
+        description = "像样的亲亲",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "啾啾 ",
+        usage = "啾啾 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@jiujiu",
+        description = "啾啾",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "吸 ",
+        usage = "吸 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@suck",
+        description = "吸",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "锤 ",
+        usage = "锤 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@hammer",
+        description = "锤",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "紧贴 ",
+        usage = "紧贴 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@tightly",
+        description = "紧贴",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "注意力涣散 ",
+        usage = "注意力涣散 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@distracted",
+        description = "注意力涣散",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "猪比喜欢 ",
+        usage = "猪比喜欢 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@anyasuki",
+        description = "阿尼亚喜欢",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "想什么 ",
+        usage = "想什么 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@thinkwhat",
+        description = "想什么",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "远离 ",
+        usage = "远离 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@keepaway",
+        description = "远离",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "结婚申请 ",
+        usage = "结婚申请 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@marriage",
+        description = "结婚申请",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "救命啊 ",
+        usage = "救命啊 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@repeat",
+        description = "重复 救命啊！",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "小画家 ",
+        usage = "小画家 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@painter",
+        description = "小画家",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "鲁迅说 ",
+        usage = "鲁迅说 <内容>",
+        permission = "anyone",
+        function = "petpet@luxunsay",
+        description = "鲁迅说过？",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "诺基亚 ",
+        usage = "诺基亚 <内容>",
+        permission = "anyone",
+        function = "petpet@nokia",
+        description = "有内鬼，停止交易",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "喜报 ",
+        usage = "喜报 <内容>",
+        permission = "anyone",
+        function = "petpet@goodnews",
+        description = "喜报",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "悲报 ",
+        usage = "悲报 <内容>",
+        permission = "anyone",
+        function = "petpet@badnews",
+        description = "悲报",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "记仇 ",
+        usage = "记仇 <内容>",
+        permission = "anyone",
+        function = "petpet@holdgrudge",
+        description = "这仇我记下了...",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "狂爱 ",
+        usage = "狂爱 <内容>",
+        permission = "anyone",
+        function = "petpet@fanatic",
+        description = "狂粉",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "低语 ",
+        usage = "低语 <内容>",
+        permission = "anyone",
+        function = "petpet@murmur",
+        description = "低语",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "别说了 ",
+        usage = "别说了 <内容>",
+        permission = "anyone",
+        function = "petpet@shutup",
+        description = "别说了...",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "一巴掌 ",
+        usage = "一巴掌 <内容>",
+        permission = "anyone",
+        function = "petpet@slap",
+        description = "一巴掌...",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "坐牢 ",
+        usage = "坐牢 <内容>",
+        permission = "anyone",
+        function = "petpet@imprison",
+        description = "坐牢...",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "滚屏 ",
+        usage = "滚屏 <内容>",
+        permission = "anyone",
+        function = "petpet@scroll",
+        description = "滚屏...",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "情商 ",
+        usage = "情商 <低情商内容> <高情商内容>",
+        permission = "anyone",
+        function = "petpet@high_EQ",
+        description = "情商姐",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "吴京 ",
+        usage = "吴京 <吴京内容> <中国内容>",
+        permission = "anyone",
+        function = "petpet@wujing",
+        description = "吴京xx中国xx",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "口号 ",
+        usage = "口号 <内容，至少6条，空格间隔>",
+        permission = "anyone",
+        function = "petpet@slogan",
+        description = "口号",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "起来了 ",
+        usage = "起来了 <内容>",
+        permission = "anyone",
+        function = "petpet@wakeup",
+        description = "起来了",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "举牌 ",
+        usage = "举牌 <内容>",
+        permission = "anyone",
+        function = "petpet@raisesign",
+        description = "举牌子",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "可达鸭 ",
+        usage = "可达鸭 <内容1> <内容2>",
+        permission = "anyone",
+        function = "petpet@psyduck",
+        description = "可达鸭",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "刮刮乐 ",
+        usage = "刮刮乐 <内容>",
+        permission = "anyone",
+        function = "petpet@scratchoff",
+        description = "刮刮乐",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "升天 ",
+        usage = "升天 <内容>",
+        permission = "anyone",
+        function = "petpet@ascension",
+        description = "升天",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "快跑 ",
+        usage = "快跑 <内容>",
+        permission = "anyone",
+        function = "petpet@run",
+        description = "口号",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "流星 ",
+        usage = "流星 <内容>",
+        permission = "anyone",
+        function = "petpet@meteor",
+        description = "流星",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "许愿失败 ",
+        usage = "许愿失败 <内容>",
+        permission = "anyone",
+        function = "petpet@wish_fail",
+        description = "许愿失败",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "整点薯条 ",
+        usage = "整点薯条 <内容，四个参数，空格隔开>",
+        permission = "anyone",
+        function = "petpet@findchips",
+        description = "整点薯条",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "大鸭鸭举牌 ",
+        usage = "大鸭鸭举牌 <内容>",
+        permission = "anyone",
+        function = "petpet@bronya_holdsign",
+        description = "大鸭鸭举牌",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "pornhub ",
+        usage = "pornhub <内容1> <内容2>",
+        permission = "anyone",
+        function = "petpet@pornhub",
+        description = "pornhub",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "youtube ",
+        usage = "youtube <内容1> <内容2>",
+        permission = "anyone",
+        function = "petpet@youtube",
+        description = "youtube",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "google ",
+        usage = "google <内容>",
+        permission = "anyone",
+        function = "petpet@google",
+        description = "google",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "5000兆 ",
+        usage = "5000兆 <内容1> <内容2>",
+        permission = "anyone",
+        function = "petpet@fivethousand_choyen",
+        description = "5000兆",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "douyin ",
+        usage = "douyin <内容>",
+        permission = "anyone",
+        function = "petpet@douyin",
+        description = "douyin",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "不喊我 ",
+        usage = "不喊我 <内容>",
+        permission = "anyone",
+        function = "petpet@not_call_me",
+        description = "5000兆",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "王境泽",
+        usage = "王境泽 <台词，空格间隔>",
+        permission = "anyone",
+        function = "petpet@wangjingze",
+        description = "wangjingze",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "为所欲为",
+        usage = "为所欲为 <台词，空格间隔>",
+        permission = "anyone",
+        function = "petpet@weisuoyuwei",
+        description = "weisuoyuwei",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "馋身子",
+        usage = "馋身子 <台词，空格间隔>",
+        permission = "anyone",
+        function = "petpet@chanshenzi",
+        description = "馋身子",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "切格瓦拉",
+        usage = "切格瓦拉 <台词，空格间隔>",
+        permission = "anyone",
+        function = "petpet@qiegewala",
+        description = "切格瓦拉",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "谁反对",
+        usage = "谁反对 <台词，空格间隔>",
+        permission = "anyone",
+        function = "petpet@shuifandui",
+        description = "谁反对",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "曾小贤",
+        usage = "曾小贤 <台词，空格间隔>",
+        permission = "anyone",
+        function = "petpet@zengxiaoxian",
+        description = "曾小贤",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "压力大爷",
+        usage = "压力大爷 <台词，空格间隔>",
+        permission = "anyone",
+        function = "petpet@yalidaye",
+        description = "压力大爷",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "你好骚啊",
+        usage = "你好骚啊 <台词，空格间隔>",
+        permission = "anyone",
+        function = "petpet@nihaosaoa",
+        description = "你好骚啊",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "食屎啦你",
+        usage = "食屎啦你 <台词，空格间隔>",
+        permission = "anyone",
+        function = "petpet@shishilani",
+        description = "食屎啦你",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "五年怎么过的",
+        usage = "五年怎么过的 <台词，空格间隔>",
+        permission = "anyone",
+        function = "petpet@wunian",
+        description = "五年怎么过的",
+        mode = "文字表情"
+    )
+    @RegCmd(
+        name = "防诱拐 ",
+        usage = "防诱拐 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@anti_kidnap",
+        description = "防诱拐",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "字符画 ",
+        usage = "字符画 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@charpic",
+        description = "字符画",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "我老婆 ",
+        usage = "我老婆 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@mywife",
+        description = "我老婆",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "胡桃平板 ",
+        usage = "胡桃平板 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@walnutpad",
+        description = "胡桃平板",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "胡桃放大 ",
+        usage = "胡桃放大 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@walnut_zoom",
+        description = "胡桃放大",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "敲黑板 ",
+        usage = "敲黑板 <QQ号或@对方> <附加内容>",
+        permission = "anyone",
+        function = "petpet@teach",
+        description = "敲黑板",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "上瘾 ",
+        usage = "上瘾 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@addition",
+        description = "上瘾",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "手枪 ",
+        usage = "手枪 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@gun",
+        description = "手枪",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "高血压 ",
+        usage = "高血压 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@blood_pressure",
+        description = "高血压",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "看书 ",
+        usage = "看书 <QQ号或@对方>[ <附加内容>]",
+        permission = "anyone",
+        function = "petpet@read_book",
+        description = "看书",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "遇到困难请拨打 ",
+        usage = "遇到困难请拨打 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@call_110",
+        description = "遇到困难请拨打",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "迷惑 ",
+        usage = "迷惑 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@confuse",
+        description = "迷惑",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "打穿 ",
+        usage = "打穿 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@hit_screen",
+        description = "打穿",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "击剑 ",
+        usage = "击剑 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@fencing",
+        description = "击剑",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "抱大腿 ",
+        usage = "抱大腿 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@hug_leg",
+        description = "抱大腿",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "唐可可举牌 ",
+        usage = "唐可可举牌 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@tankuku_holdsign",
+        description = "唐可可举牌",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "无响应 ",
+        usage = "无响应 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@no_response",
+        description = "无响应",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "抱紧 ",
+        usage = "抱紧 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@hold_tight",
+        description = "抱紧",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "看扁 ",
+        usage = "看扁 <QQ号或@对方>[ <附加内容，文字内容和拉扁比例>]",
+        permission = "anyone",
+        function = "petpet@look_flat",
+        description = "看扁",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "看图标 ",
+        usage = "看图标 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@look_this_icon",
+        description = "看图标",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "舰长 ",
+        usage = "舰长 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@captain",
+        description = "舰长",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "急急国王 ",
+        usage = "急急国王 <QQ号或@对方>[ <附加内容>]",
+        permission = "anyone",
+        function = "petpet@jiji_king",
+        description = "急急国王",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "不文明 ",
+        usage = "不文明 <QQ号或@对方>[ <附加内容>]",
+        permission = "anyone",
+        function = "petpet@incivilization",
+        description = "不文明",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "一起 ",
+        usage = "一起 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@together",
+        description = "一起",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "波纹 ",
+        usage = "波纹 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@wave",
+        description = "波纹",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "诈尸 ",
+        usage = "诈尸 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@rise_dead",
+        description = "诈尸",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "卡比锤 ",
+        usage = "卡比锤 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@kirby_hammer",
+        description = "卡比锤",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "木鱼 ",
+        usage = "木鱼 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@wooden_fish",
+        description = "木鱼",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "凯露指 ",
+        usage = "凯露指 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@karyl_point",
+        description = "凯露指",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "踢球 ",
+        usage = "踢球 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@kick_ball",
+        description = "踢球",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "砸 ",
+        usage = "砸 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@smash",
+        description = "砸",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "波奇手稿 ",
+        usage = "波奇手稿 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@bocchi_draft",
+        description = "波奇手稿",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "坐得住 ",
+        usage = "坐得住 <QQ号或@对方>",
+        permission = "anyone",
+        function = "petpet@sit_still",
+        description = "坐得住",
+        mode = "表  情  包"
+    )
+    @RegCmd(
+        name = "偷学 ",
+        usage = "偷学 <QQ号或@对方>[ <附加内容>]",
+        permission = "anyone",
+        function = "petpet@learn",
+        description = "偷学",
+        mode = "表  情  包"
+    )
         ]
         
     def GetUserInfo(self, userid):
