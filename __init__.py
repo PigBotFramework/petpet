@@ -154,8 +154,8 @@ class petpet(PBF):
             if 'at' in userid:
                 userid = CQCode(userid).get('qq')[0]
 
-            if userid == str(self.data.botSettings.get("owner")) or userid == str(
-                    self.data.botSettings.get("myselfqn")) or userid == str(yamldata.get("chat").get("owner")):
+            if userid == str(self.data.botSettings._get("owner")) or userid == str(
+                    self.data.botSettings._get("myselfqn")) or userid == str(yamldata.get("chat").get("owner")):
                 userid = self.data.se.get('user_id')
 
         url = "http://q2.qlogo.cn/headimg_dl?dst_uin={0}&spec=100".format(userid)
