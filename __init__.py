@@ -1,23 +1,27 @@
-from pbf import PBF
-from utils.RegCmd import RegCmd
-from functools import partial
-import random, sys, requests, imageio, time, math, traceback, re
+import math
+import random
+import re
+import time
+import traceback
 from collections import namedtuple
+from datetime import datetime
+from enum import Enum
+from io import BytesIO
+from typing import Dict, Optional, List, Tuple, Protocol
+from urllib.request import urlopen
+
+import imageio
 from PIL import Image, ImageFilter, ImageDraw, ImageEnhance
 from PIL.Image import Image as IMG
-from typing import Dict, Optional, Callable, List, Tuple, Protocol
-from collections import namedtuple
-from io import BytesIO
-from dataclasses import dataclass
 from typing_extensions import Literal
-from urllib.request import urlopen, Request
-from datetime import datetime
-from utils.pillow.build_image import BuildImage, Text2Image
-from utils.pillow.gradient import ColorStop, LinearGradient
-from utils.pillow.fonts import Font
-from enum import Enum
-from PbfStruct import yamldata
-from utils.cqcode import CQCode
+
+from pbf.controller.Data import yamldata
+from pbf.controller.PBF import PBF
+from pbf.utils.CQCode import CQCode
+from pbf.utils.RegCmd import RegCmd
+from pbf.utils.pillow.build_image import BuildImage, Text2Image
+from pbf.utils.pillow.fonts import Font
+from pbf.utils.pillow.gradient import ColorStop, LinearGradient
 
 _name = "表情包制作"
 _version = "1.0.1"
@@ -31,13 +35,16 @@ REQUIRE_NAME = "找不到名字，加上名字再试吧~"
 REQUIRE_ARG = "该表情至少需要一个参数"
 OVER_LENGTH_MSG = "太长啦！！！"
 
+
 class Maker(Protocol):
     def __call__(self, img: BuildImage) -> BuildImage:
         ...
 
+
 class GifMaker(Protocol):
     def __call__(self, i: int) -> Maker:
         ...
+
 
 def get_avg_duration(image: IMG) -> float:
     if not getattr(image, "is_animated", False):
@@ -73,6 +80,7 @@ def split_gif(image: IMG) -> List[IMG]:
         frames[0].info["transparency"] = image.info["transparency"]
     return frames
 
+
 class FrameAlignPolicy(Enum):
     """
     要叠加的gif长度大于基准gif时，是否延长基准gif长度以对齐两个gif
@@ -87,1133 +95,18 @@ class FrameAlignPolicy(Enum):
     extend_loop = 3
     """以循环方式延长"""
 
+
 def load_image(path):
     return BuildImage.open("./resources/images/" + path).convert("RGBA")
 
 
 class petpet(PBF):
-    def __enter__(self):
-        return [
-    @RegCmd(
-        name = "摸 ",
-        usage = "摸 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@petpet",
-        description = "生成摸头像的表情包",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "滚 ",
-        usage = "滚 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@roll",
-        description = "滚某个人的头像",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "小天使 ",
-        usage = "小天使 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@littleangel",
-        description = "生成小天使图片",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "警察 ",
-        usage = "警察 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@police1",
-        description = "出警！",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "兑换卷 ",
-        usage = "兑换卷 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@coupon",
-        description = "XX陪睡兑换卷！",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "听音乐 ",
-        usage = "听音乐 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@listen_music",
-        description = "听音乐！",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "扔 ",
-        usage = "扔 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@throw_gif",
-        description = "扔某人的头像",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "吃 ",
-        usage = "吃 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@eat",
-        description = "吃掉它！",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "我朋友说 ",
-        usage = "我朋友说 <QQ号或@对方> <说的内容>",
-        permission = "anyone",
-        function = "petpet@my_friend",
-        description = "我有个朋友说...",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "假冒伪劣 ",
-        usage = "假冒伪劣 <昵称> <说的内容> <头像>",
-        permission = "anyone",
-        function = "petpet@make_dialog_picture",
-        description = "生成对话图片",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "捶 ",
-        usage = "捶 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@thump",
-        description = "捶某人的头像",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "亲 ",
-        usage = "亲 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@kiss",
-        description = "亲Ta！",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "贴贴 ",
-        usage = "贴贴 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@rub",
-        description = "贴贴对方！",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "万能表情 ",
-        usage = "万能表情 <QQ号或@对方> <附加文字>",
-        permission = "anyone",
-        function = "petpet@universal",
-        description = "万能表情",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "顶 ",
-        usage = "顶 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@play",
-        description = "顶",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "拍 ",
-        usage = "拍 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@pat",
-        description = "拍",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "撕 ",
-        usage = "撕 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@rip",
-        description = "撕",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "爬 ",
-        usage = "爬 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@crawl",
-        description = "爬",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "精神支柱 ",
-        usage = "精神支柱 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@support",
-        description = "精神支柱",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "一直 ",
-        usage = "一直 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@always",
-        description = "一直",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "加载中 ",
-        usage = "加载中 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@loading",
-        description = "加载中",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "转 ",
-        usage = "转 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@turn",
-        description = "转",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "不要靠近 ",
-        usage = "不要靠近 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@dont_touch",
-        description = "不要靠近",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "一样 ",
-        usage = "一样 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@alike",
-        description = "一样",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "玩游戏 ",
-        usage = "玩游戏 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@play_game",
-        description = "玩游戏",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "膜 ",
-        usage = "膜 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@worship",
-        description = "膜",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "啃 ",
-        usage = "啃 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@bite",
-        description = "啃",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "出警 ",
-        usage = "出警 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@police",
-        description = "出警",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "问问 ",
-        usage = "问问 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@ask",
-        description = "问问",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "舔 ",
-        usage = "舔 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@prpr",
-        description = "舔",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "搓 ",
-        usage = "搓 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@twist",
-        description = "搓",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "墙纸 ",
-        usage = "墙纸 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@wallpaper",
-        description = "墙纸",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "交个朋友 ",
-        usage = "交个朋友 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@make_friend",
-        description = "交个朋友",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "继续干活 ",
-        usage = "继续干活 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@back_to_work",
-        description = "继续干活",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "完美 ",
-        usage = "完美 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@perfect",
-        description = "完美",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "关注 ",
-        usage = "关注 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@follow",
-        description = "关注",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "这像画吗 ",
-        usage = "这像画吗 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@paint",
-        description = "这像画吗",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "震惊 ",
-        usage = "震惊 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@shock",
-        description = "震惊",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "典中典 ",
-        usage = "典中典 <QQ号或@对方> <附加文字>",
-        permission = "anyone",
-        function = "petpet@dianzhongdian",
-        description = "典中典",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "哈哈镜 ",
-        usage = "哈哈镜 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@funny_mirror",
-        description = "哈哈镜",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "永远爱你 ",
-        usage = "永远爱你 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@love_you",
-        description = "永远爱你",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "对称 ",
-        usage = "对称 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@symmetric",
-        description = "对称",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "安全感 ",
-        usage = "安全感 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@safe_sense",
-        description = "安全感",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "永远喜欢 ",
-        usage = "永远喜欢 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@always_like",
-        description = "永远喜欢",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "采访 ",
-        usage = "采访 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@interview",
-        description = "采访",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "打拳 ",
-        usage = "打拳 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@punch",
-        description = "打拳",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "群青 ",
-        usage = "群青 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@ cyan",
-        description = "群青",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "捣 ",
-        usage = "捣 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@pound",
-        description = "捣",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "需要 ",
-        usage = "需要 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@need",
-        description = "需要",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "捂脸 ",
-        usage = "捂脸 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@cover_face",
-        description = "捂脸",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "敲 ",
-        usage = "敲 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@knock",
-        description = "敲",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "垃圾 ",
-        usage = "垃圾 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@garbage",
-        description = "垃圾",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "为什么@我 ",
-        usage = "为什么@我 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@whyatme",
-        description = "为什么@我",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "像样的亲亲 ",
-        usage = "像样的亲亲 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@decent_kiss",
-        description = "像样的亲亲",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "啾啾 ",
-        usage = "啾啾 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@jiujiu",
-        description = "啾啾",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "吸 ",
-        usage = "吸 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@suck",
-        description = "吸",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "锤 ",
-        usage = "锤 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@hammer",
-        description = "锤",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "紧贴 ",
-        usage = "紧贴 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@tightly",
-        description = "紧贴",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "注意力涣散 ",
-        usage = "注意力涣散 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@distracted",
-        description = "注意力涣散",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "猪比喜欢 ",
-        usage = "猪比喜欢 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@anyasuki",
-        description = "阿尼亚喜欢",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "想什么 ",
-        usage = "想什么 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@thinkwhat",
-        description = "想什么",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "远离 ",
-        usage = "远离 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@keepaway",
-        description = "远离",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "结婚申请 ",
-        usage = "结婚申请 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@marriage",
-        description = "结婚申请",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "救命啊 ",
-        usage = "救命啊 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@repeat",
-        description = "重复 救命啊！",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "小画家 ",
-        usage = "小画家 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@painter",
-        description = "小画家",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "鲁迅说 ",
-        usage = "鲁迅说 <内容>",
-        permission = "anyone",
-        function = "petpet@luxunsay",
-        description = "鲁迅说过？",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "诺基亚 ",
-        usage = "诺基亚 <内容>",
-        permission = "anyone",
-        function = "petpet@nokia",
-        description = "有内鬼，停止交易",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "喜报 ",
-        usage = "喜报 <内容>",
-        permission = "anyone",
-        function = "petpet@goodnews",
-        description = "喜报",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "悲报 ",
-        usage = "悲报 <内容>",
-        permission = "anyone",
-        function = "petpet@badnews",
-        description = "悲报",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "记仇 ",
-        usage = "记仇 <内容>",
-        permission = "anyone",
-        function = "petpet@holdgrudge",
-        description = "这仇我记下了...",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "狂爱 ",
-        usage = "狂爱 <内容>",
-        permission = "anyone",
-        function = "petpet@fanatic",
-        description = "狂粉",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "低语 ",
-        usage = "低语 <内容>",
-        permission = "anyone",
-        function = "petpet@murmur",
-        description = "低语",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "别说了 ",
-        usage = "别说了 <内容>",
-        permission = "anyone",
-        function = "petpet@shutup",
-        description = "别说了...",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "一巴掌 ",
-        usage = "一巴掌 <内容>",
-        permission = "anyone",
-        function = "petpet@slap",
-        description = "一巴掌...",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "坐牢 ",
-        usage = "坐牢 <内容>",
-        permission = "anyone",
-        function = "petpet@imprison",
-        description = "坐牢...",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "滚屏 ",
-        usage = "滚屏 <内容>",
-        permission = "anyone",
-        function = "petpet@scroll",
-        description = "滚屏...",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "情商 ",
-        usage = "情商 <低情商内容> <高情商内容>",
-        permission = "anyone",
-        function = "petpet@high_EQ",
-        description = "情商姐",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "吴京 ",
-        usage = "吴京 <吴京内容> <中国内容>",
-        permission = "anyone",
-        function = "petpet@wujing",
-        description = "吴京xx中国xx",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "口号 ",
-        usage = "口号 <内容，至少6条，空格间隔>",
-        permission = "anyone",
-        function = "petpet@slogan",
-        description = "口号",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "起来了 ",
-        usage = "起来了 <内容>",
-        permission = "anyone",
-        function = "petpet@wakeup",
-        description = "起来了",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "举牌 ",
-        usage = "举牌 <内容>",
-        permission = "anyone",
-        function = "petpet@raisesign",
-        description = "举牌子",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "可达鸭 ",
-        usage = "可达鸭 <内容1> <内容2>",
-        permission = "anyone",
-        function = "petpet@psyduck",
-        description = "可达鸭",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "刮刮乐 ",
-        usage = "刮刮乐 <内容>",
-        permission = "anyone",
-        function = "petpet@scratchoff",
-        description = "刮刮乐",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "升天 ",
-        usage = "升天 <内容>",
-        permission = "anyone",
-        function = "petpet@ascension",
-        description = "升天",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "快跑 ",
-        usage = "快跑 <内容>",
-        permission = "anyone",
-        function = "petpet@run",
-        description = "口号",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "流星 ",
-        usage = "流星 <内容>",
-        permission = "anyone",
-        function = "petpet@meteor",
-        description = "流星",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "许愿失败 ",
-        usage = "许愿失败 <内容>",
-        permission = "anyone",
-        function = "petpet@wish_fail",
-        description = "许愿失败",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "整点薯条 ",
-        usage = "整点薯条 <内容，四个参数，空格隔开>",
-        permission = "anyone",
-        function = "petpet@findchips",
-        description = "整点薯条",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "大鸭鸭举牌 ",
-        usage = "大鸭鸭举牌 <内容>",
-        permission = "anyone",
-        function = "petpet@bronya_holdsign",
-        description = "大鸭鸭举牌",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "pornhub ",
-        usage = "pornhub <内容1> <内容2>",
-        permission = "anyone",
-        function = "petpet@pornhub",
-        description = "pornhub",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "youtube ",
-        usage = "youtube <内容1> <内容2>",
-        permission = "anyone",
-        function = "petpet@youtube",
-        description = "youtube",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "google ",
-        usage = "google <内容>",
-        permission = "anyone",
-        function = "petpet@google",
-        description = "google",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "5000兆 ",
-        usage = "5000兆 <内容1> <内容2>",
-        permission = "anyone",
-        function = "petpet@fivethousand_choyen",
-        description = "5000兆",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "douyin ",
-        usage = "douyin <内容>",
-        permission = "anyone",
-        function = "petpet@douyin",
-        description = "douyin",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "不喊我 ",
-        usage = "不喊我 <内容>",
-        permission = "anyone",
-        function = "petpet@not_call_me",
-        description = "5000兆",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "王境泽",
-        usage = "王境泽 <台词，空格间隔>",
-        permission = "anyone",
-        function = "petpet@wangjingze",
-        description = "wangjingze",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "为所欲为",
-        usage = "为所欲为 <台词，空格间隔>",
-        permission = "anyone",
-        function = "petpet@weisuoyuwei",
-        description = "weisuoyuwei",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "馋身子",
-        usage = "馋身子 <台词，空格间隔>",
-        permission = "anyone",
-        function = "petpet@chanshenzi",
-        description = "馋身子",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "切格瓦拉",
-        usage = "切格瓦拉 <台词，空格间隔>",
-        permission = "anyone",
-        function = "petpet@qiegewala",
-        description = "切格瓦拉",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "谁反对",
-        usage = "谁反对 <台词，空格间隔>",
-        permission = "anyone",
-        function = "petpet@shuifandui",
-        description = "谁反对",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "曾小贤",
-        usage = "曾小贤 <台词，空格间隔>",
-        permission = "anyone",
-        function = "petpet@zengxiaoxian",
-        description = "曾小贤",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "压力大爷",
-        usage = "压力大爷 <台词，空格间隔>",
-        permission = "anyone",
-        function = "petpet@yalidaye",
-        description = "压力大爷",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "你好骚啊",
-        usage = "你好骚啊 <台词，空格间隔>",
-        permission = "anyone",
-        function = "petpet@nihaosaoa",
-        description = "你好骚啊",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "食屎啦你",
-        usage = "食屎啦你 <台词，空格间隔>",
-        permission = "anyone",
-        function = "petpet@shishilani",
-        description = "食屎啦你",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "五年怎么过的",
-        usage = "五年怎么过的 <台词，空格间隔>",
-        permission = "anyone",
-        function = "petpet@wunian",
-        description = "五年怎么过的",
-        mode = "文字表情"
-    )
-    @RegCmd(
-        name = "防诱拐 ",
-        usage = "防诱拐 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@anti_kidnap",
-        description = "防诱拐",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "字符画 ",
-        usage = "字符画 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@charpic",
-        description = "字符画",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "我老婆 ",
-        usage = "我老婆 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@mywife",
-        description = "我老婆",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "胡桃平板 ",
-        usage = "胡桃平板 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@walnutpad",
-        description = "胡桃平板",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "胡桃放大 ",
-        usage = "胡桃放大 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@walnut_zoom",
-        description = "胡桃放大",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "敲黑板 ",
-        usage = "敲黑板 <QQ号或@对方> <附加内容>",
-        permission = "anyone",
-        function = "petpet@teach",
-        description = "敲黑板",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "上瘾 ",
-        usage = "上瘾 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@addition",
-        description = "上瘾",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "手枪 ",
-        usage = "手枪 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@gun",
-        description = "手枪",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "高血压 ",
-        usage = "高血压 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@blood_pressure",
-        description = "高血压",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "看书 ",
-        usage = "看书 <QQ号或@对方>[ <附加内容>]",
-        permission = "anyone",
-        function = "petpet@read_book",
-        description = "看书",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "遇到困难请拨打 ",
-        usage = "遇到困难请拨打 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@call_110",
-        description = "遇到困难请拨打",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "迷惑 ",
-        usage = "迷惑 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@confuse",
-        description = "迷惑",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "打穿 ",
-        usage = "打穿 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@hit_screen",
-        description = "打穿",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "击剑 ",
-        usage = "击剑 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@fencing",
-        description = "击剑",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "抱大腿 ",
-        usage = "抱大腿 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@hug_leg",
-        description = "抱大腿",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "唐可可举牌 ",
-        usage = "唐可可举牌 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@tankuku_holdsign",
-        description = "唐可可举牌",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "无响应 ",
-        usage = "无响应 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@no_response",
-        description = "无响应",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "抱紧 ",
-        usage = "抱紧 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@hold_tight",
-        description = "抱紧",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "看扁 ",
-        usage = "看扁 <QQ号或@对方>[ <附加内容，文字内容和拉扁比例>]",
-        permission = "anyone",
-        function = "petpet@look_flat",
-        description = "看扁",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "看图标 ",
-        usage = "看图标 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@look_this_icon",
-        description = "看图标",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "舰长 ",
-        usage = "舰长 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@captain",
-        description = "舰长",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "急急国王 ",
-        usage = "急急国王 <QQ号或@对方>[ <附加内容>]",
-        permission = "anyone",
-        function = "petpet@jiji_king",
-        description = "急急国王",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "不文明 ",
-        usage = "不文明 <QQ号或@对方>[ <附加内容>]",
-        permission = "anyone",
-        function = "petpet@incivilization",
-        description = "不文明",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "一起 ",
-        usage = "一起 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@together",
-        description = "一起",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "波纹 ",
-        usage = "波纹 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@wave",
-        description = "波纹",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "诈尸 ",
-        usage = "诈尸 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@rise_dead",
-        description = "诈尸",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "卡比锤 ",
-        usage = "卡比锤 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@kirby_hammer",
-        description = "卡比锤",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "木鱼 ",
-        usage = "木鱼 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@wooden_fish",
-        description = "木鱼",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "凯露指 ",
-        usage = "凯露指 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@karyl_point",
-        description = "凯露指",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "踢球 ",
-        usage = "踢球 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@kick_ball",
-        description = "踢球",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "砸 ",
-        usage = "砸 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@smash",
-        description = "砸",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "波奇手稿 ",
-        usage = "波奇手稿 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@bocchi_draft",
-        description = "波奇手稿",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "坐得住 ",
-        usage = "坐得住 <QQ号或@对方>",
-        permission = "anyone",
-        function = "petpet@sit_still",
-        description = "坐得住",
-        mode = "表  情  包"
-    )
-    @RegCmd(
-        name = "偷学 ",
-        usage = "偷学 <QQ号或@对方>[ <附加内容>]",
-        permission = "anyone",
-        function = "petpet@learn",
-        description = "偷学",
-        mode = "表  情  包"
-    )
-        ]
-        
     def GetUserInfo(self, userid):
-        return self.client.CallApi('get_stranger_info', {'user_id':userid}).get('data')
-    
+        return self.client.CallApi('get_stranger_info', {'user_id': userid}).get('data')
+
     def load_image(self, path):
         return load_image(path)
-    
+
     def make_jpg_or_gif(self, img, func, gif_zoom=1, gif_max_frames=50) -> BytesIO:
         """
         制作静图或者动图
@@ -1225,7 +118,8 @@ class petpet(PBF):
         """
         image = img.image
         if not getattr(image, "is_animated", False):
-            return self.client.msg().raw('[CQ:image,file=https://pbfresources.xzynb.top/createimg/{0}]'.format(func(img.convert("RGBA")).save_jpg()))
+            return self.client.msg().raw('[CQ:image,file=https://pbfresources.xzynb.top/createimg/{0}]'.format(
+                func(img.convert("RGBA")).save_jpg()))
         else:
             index = range(image.n_frames)
             ratio = image.n_frames / gif_max_frames
@@ -1233,7 +127,7 @@ class petpet(PBF):
             if ratio > 1:
                 index = (int(i * ratio) for i in range(gif_max_frames))
                 duration *= ratio
-    
+
             frames = []
             for i in index:
                 image.seek(i)
@@ -1244,14 +138,14 @@ class petpet(PBF):
                     ).image
                 )
             return self.save_gif(frames, duration)
-    
+
     def save_gif(self, frames: List[IMG], duration: float):
         filename = '{0}.gif'.format(time.time())
         output = './resources/createimg/{0}'.format(filename)
         imageio.mimsave(output, frames, format="gif", duration=duration)
         self.client.msg().raw('[CQ:image,file=https://pbfresources.xzynb.top/createimg/{0}]'.format(filename))
         return output
-        
+
     def GetImage(self, userid=None):
         if not userid:
             userid = self.data.message
@@ -1259,33 +153,35 @@ class petpet(PBF):
                 userid = userid.split(' ')[0]
             if 'at' in userid:
                 userid = CQCode(userid).get('qq')[0]
-            
-            if userid == str(self.data.botSettings.get("owner")) or userid == str(self.data.botSettings.get("myselfqn")) or userid == str(yamldata.get("chat").get("owner")):
+
+            if userid == str(self.data.botSettings.get("owner")) or userid == str(
+                    self.data.botSettings.get("myselfqn")) or userid == str(yamldata.get("chat").get("owner")):
                 userid = self.data.se.get('user_id')
-        
+
         url = "http://q2.qlogo.cn/headimg_dl?dst_uin={0}&spec=100".format(userid)
         try:
             image_bytes = urlopen(url).read()
             # internal data file
             data_stream = BytesIO(image_bytes)
             # open as a PIL image object
-            #以一个PIL图像对象打开
+            # 以一个PIL图像对象打开
             return BuildImage.open(data_stream)
         except Exception as e:
             self.client.msg().raw("获取用户头像失败，请重试")
-        
+
     def save_and_send(self, frame):
-        self.client.msg().raw('[CQ:image,file=https://pbfresources.xzynb.top/createimg/{0}]'.format(frame.save_jpg()))
-    
+        self.client.msg().raw(
+            '[CQ:image,file=https://pbfresources.xzynb.top/createimg/{0}]'.format(frame.save_jpg()))
+
     def make_gif_or_combined_gif(
-        self,
-        img: BuildImage,
-        maker: GifMaker,
-        frame_num: int,
-        duration: float,
-        frame_align: FrameAlignPolicy = FrameAlignPolicy.no_extend,
-        input_based: bool = False,
-        keep_transparency: bool = False,
+            self,
+            img: BuildImage,
+            maker: GifMaker,
+            frame_num: int,
+            duration: float,
+            frame_align: FrameAlignPolicy = FrameAlignPolicy.no_extend,
+            input_based: bool = False,
+            keep_transparency: bool = False,
     ) -> BytesIO:
         """
         使用静图或动图制作gif
@@ -1301,12 +197,12 @@ class petpet(PBF):
         image = img.image
         if not getattr(image, "is_animated", False):
             return self.save_gif([maker(i)(img).image for i in range(frame_num)], duration)
-    
+
         frame_num_in = image.n_frames
         duration_in = get_avg_duration(image) / 1000
         total_duration_in = frame_num_in * duration_in
         total_duration = frame_num * duration
-    
+
         if input_based:
             frame_num_base = frame_num_in
             frame_num_fit = frame_num
@@ -1321,44 +217,44 @@ class petpet(PBF):
             duration_fit = duration_in
             total_duration_base = total_duration
             total_duration_fit = total_duration_in
-    
+
         frame_idxs: List[int] = list(range(frame_num_base))
         diff_duration = total_duration_fit - total_duration_base
         diff_num = int(diff_duration / duration_base)
-    
+
         if diff_duration >= duration_base:
             if frame_align == FrameAlignPolicy.extend_first:
                 frame_idxs = [0] * diff_num + frame_idxs
-    
+
             elif frame_align == FrameAlignPolicy.extend_last:
                 frame_idxs += [frame_num_base - 1] * diff_num
-    
+
             elif frame_align == FrameAlignPolicy.extend_loop:
                 frame_num_total = frame_num_base
                 # 重复基准gif，直到两个gif总时长之差在1个间隔以内，或总帧数超出最大帧数
                 while (
-                    frame_num_total + frame_num_base <= 100
+                        frame_num_total + frame_num_base <= 100
                 ):
                     frame_num_total += frame_num_base
                     frame_idxs += list(range(frame_num_base))
                     multiple = round(frame_num_total * duration_base / total_duration_fit)
                     if (
-                        math.fabs(
-                            total_duration_fit * multiple - frame_num_total * duration_base
-                        )
-                        <= duration_base
+                            math.fabs(
+                                total_duration_fit * multiple - frame_num_total * duration_base
+                            )
+                            <= duration_base
                     ):
                         break
-    
+
         frames: List[IMG] = []
         frame_idx_fit = 0
         time_start = 0
         for i, idx in enumerate(frame_idxs):
             while frame_idx_fit < frame_num_fit:
                 if (
-                    frame_idx_fit * duration_fit
-                    <= i * duration_base - time_start
-                    < (frame_idx_fit + 1) * duration_fit
+                        frame_idx_fit * duration_fit
+                        <= i * duration_base - time_start
+                        < (frame_idx_fit + 1) * duration_fit
                 ):
                     if input_based:
                         idx_in = idx
@@ -1366,7 +262,7 @@ class petpet(PBF):
                     else:
                         idx_in = frame_idx_fit
                         idx_maker = idx
-    
+
                     func = maker(idx_maker)
                     image.seek(idx_in)
                     frames.append(func(BuildImage(image.copy())).image)
@@ -1376,17 +272,24 @@ class petpet(PBF):
                     if frame_idx_fit >= frame_num_fit:
                         frame_idx_fit = 0
                         time_start += total_duration_fit
-    
+
         if keep_transparency:
             image.seek(0)
             if image.info.__contains__("transparency"):
                 frames[0].info["transparency"] = image.info["transparency"]
-    
+
         return self.save_gif(frames, duration)
-    
+
     def GetArgs(self):
         return " ".join(self.data.args[2:len(self.data.args)]).strip()
-    
+
+    @RegCmd(
+        name="偷学 ",
+        usage="偷学 <QQ号或@对方>[ <附加内容>]",
+        permission="anyone",
+        description="偷学",
+        mode="表  情  包"
+    )
     def learn(self):
         arg = self.GetArgs()
         img = self.GetImage()
@@ -1402,20 +305,27 @@ class petpet(PBF):
             )
         except ValueError:
             return TEXT_TOO_LONG
-    
+
         def make(img: BuildImage) -> BuildImage:
             return frame.copy().paste(
                 img.resize((1751, 1347), keep_ratio=True), (1440, 0), alpha=True
             )
-    
+
         self.make_jpg_or_gif(img, make)
-    
+
+    @RegCmd(
+        name="坐得住 ",
+        usage="坐得住 <QQ号或@对方>",
+        permission="anyone",
+        description="坐得住",
+        mode="表  情  包"
+    )
     def sit_still(self):
         img = self.GetImage()
         userid = self.data.message
         if 'at' in userid:
             userid = CQCode(userid).get('qq')[0]
-        
+
         name = self.GetUserInfo(userid).get('nickname')
         frame = load_image("sit_still/0.png")
         try:
@@ -1431,7 +341,14 @@ class petpet(PBF):
         img = img.convert("RGBA").circle().resize((150, 150)).rotate(-10, expand=True)
         frame.paste(img, (268, 344), alpha=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="踢球 ",
+        usage="踢球 <QQ号或@对方>",
+        permission="anyone",
+        description="踢球",
+        mode="表  情  包"
+    )
     def kick_ball(self):
         img = self.GetImage()
         img = img.convert("RGBA").square().resize((78, 78))
@@ -1448,7 +365,14 @@ class petpet(PBF):
             frame.paste(img.rotate(-24 * i), locs[i], below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.1)
-    
+
+    @RegCmd(
+        name="波奇手稿 ",
+        usage="波奇手稿 <QQ号或@对方>",
+        permission="anyone",
+        description="波奇手稿",
+        mode="表  情  包"
+    )
     def bocchi_draft(self):
         img = self.GetImage()
         img = img.convert("RGBA").resize((350, 400), keep_ratio=True)
@@ -1477,18 +401,32 @@ class petpet(PBF):
             frame.paste(img.perspective(points), pos, below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.08)
-    
+
+    @RegCmd(
+        name="砸 ",
+        usage="砸 <QQ号或@对方>",
+        permission="anyone",
+        description="砸",
+        mode="表  情  包"
+    )
     def smash(self):
         img = self.GetImage()
         frame = load_image("smash/0.png")
-    
+
         def make(img: BuildImage) -> BuildImage:
             points = ((1, 237), (826, 1), (832, 508), (160, 732))
             screen = img.resize((800, 500), keep_ratio=True).perspective(points)
             return frame.copy().paste(screen, (-136, -81), below=True)
-    
+
         self.make_jpg_or_gif(img, make)
-    
+
+    @RegCmd(
+        name="木鱼 ",
+        usage="木鱼 <QQ号或@对方>",
+        permission="anyone",
+        description="木鱼",
+        mode="表  情  包"
+    )
     def wooden_fish(self):
         img = self.GetImage()
         img = img.convert("RGBA").resize((85, 85))
@@ -1497,23 +435,38 @@ class petpet(PBF):
             for i in range(66)
         ]
         self.save_gif(frames, 0.1)
-    
+
+    @RegCmd(
+        name="凯露指 ",
+        usage="凯露指 <QQ号或@对方>",
+        permission="anyone",
+        description="凯露指",
+        mode="表  情  包"
+    )
     def karyl_point(self):
         img = self.GetImage()
         img = img.convert("RGBA").rotate(7.5, expand=True).resize((225, 225))
         frame = load_image("karyl_point/0.png")
         frame.paste(img, (87, 790), alpha=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="卡比锤 ",
+        usage="卡比锤 <QQ号或@对方>",
+        permission="anyone",
+        description="卡比锤",
+        mode="表  情  包"
+    )
     def kirby_hammer(self):
         img = self.GetImage()
         # fmt: off
         positions = [
-            (318, 163), (319, 173), (320, 183), (317, 193), (312, 199), 
-            (297, 212), (289, 218), (280, 224), (278, 223), (278, 220), 
-            (280, 215), (280, 213), (280, 210), (280, 206), (280, 201), 
+            (318, 163), (319, 173), (320, 183), (317, 193), (312, 199),
+            (297, 212), (289, 218), (280, 224), (278, 223), (278, 220),
+            (280, 215), (280, 213), (280, 210), (280, 206), (280, 201),
             (280, 192), (280, 188), (280, 184), (280, 179)
         ]
+
         # fmt: on
         def maker(i: int) -> Maker:
             def make(img: BuildImage) -> BuildImage:
@@ -1532,11 +485,18 @@ class petpet(PBF):
                     x = x + 40 - img.width // 2
                     frame.paste(img, (x, y), alpha=True)
                 return frame
-    
+
             return make
-    
+
         self.make_gif_or_combined_gif(img, maker, 62, 0.05, FrameAlignPolicy.extend_loop)
-    
+
+    @RegCmd(
+        name="诈尸 ",
+        usage="诈尸 <QQ号或@对方>",
+        permission="anyone",
+        description="诈尸",
+        mode="表  情  包"
+    )
     def rise_dead(self):
         img = self.GetImage()
         locs = [
@@ -1559,7 +519,14 @@ class petpet(PBF):
                 frame.paste(imgs[idx], (x, y), below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.15)
-    
+
+    @RegCmd(
+        name="波纹 ",
+        usage="波纹 <QQ号或@对方>",
+        permission="anyone",
+        description="波纹",
+        mode="表  情  包"
+    )
     def wave(self):
         img = self.GetImage()
         img_w = min(max(img.width, 360), 720)
@@ -1568,7 +535,7 @@ class petpet(PBF):
         frame_num = 8
         phase = 0
         sin = lambda x: amp * math.sin(2 * math.pi / period * (x + phase)) / 2
-    
+
         def maker(i: int) -> Maker:
             def make(img: BuildImage) -> BuildImage:
                 img = img.resize_width(img_w)
@@ -1582,24 +549,31 @@ class petpet(PBF):
                             frame.image.putpixel(
                                 (i, j), img.image.getpixel((i + dx, j + dy))
                             )
-    
+
                 frame = frame.resize_canvas((int(img_w - amp), int(img_h - amp)))
                 nonlocal phase
                 phase += period / frame_num
                 return frame
-    
+
             return make
-    
+
         self.make_gif_or_combined_gif(
             img, maker, frame_num, 0.01, FrameAlignPolicy.extend_loop
         )
-    
+
+    @RegCmd(
+        name="一起 ",
+        usage="一起 <QQ号或@对方>",
+        permission="anyone",
+        description="一起",
+        mode="表  情  包"
+    )
     def together(self):
         img = self.GetImage()
         userid = self.data.message
         if 'at' in userid:
             userid = CQCode(userid).get("qq")[0]
-        
+
         username = self.GetUserInfo(userid).get('nickname')
         frame = load_image("together/0.png")
         frame.paste(img.convert("RGBA").resize((63, 63)), (132, 36))
@@ -1616,7 +590,14 @@ class petpet(PBF):
         except ValueError:
             return TEXT_TOO_LONG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="不文明 ",
+        usage="不文明 <QQ号或@对方>[ <附加内容>]",
+        permission="anyone",
+        description="不文明",
+        mode="表  情  包"
+    )
     def incivilization(self):
         img = self.GetImage()
         arg = self.GetArgs()
@@ -1638,22 +619,29 @@ class petpet(PBF):
         except ValueError:
             return TEXT_TOO_LONG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="急急国王 ",
+        usage="急急国王 <QQ号或@对方>[ <附加内容>]",
+        permission="anyone",
+        description="急急国王",
+        mode="表  情  包"
+    )
     def jiji_king(self):
         args = self.GetArgs().split()
         user_imgs: List[BuildImage] = []
         user_imgs.append(self.GetImage())
-        
+
         block_num = 5
         if len(user_imgs) >= 7 or len(args) >= 7:
             block_num = max(len(user_imgs), len(args)) - 1
-    
+
         chars = ["急"]
         text = "我是急急国王"
         if len(args) == 1:
             if len(user_imgs) == 1:
                 chars = [args[0]] * block_num
-                text = f"我是{args[0]*2}国王"
+                text = f"我是{args[0] * 2}国王"
             else:
                 text = args[0]
         elif len(args) == 2:
@@ -1664,14 +652,14 @@ class petpet(PBF):
                 [[arg] * math.ceil(block_num / len(args[:-1])) for arg in args[:-1]], []
             )
             text = args[-1]
-    
+
         frame = BuildImage.new("RGBA", (10 + 100 * block_num, 400), "white")
         king = load_image("jiji_king/0.png")
         king.paste(
             user_imgs[0].convert("RGBA").square().resize((125, 125)), (237, 5), alpha=True
         )
         frame.paste(king, ((frame.width - king.width) // 2, 0))
-    
+
         if len(user_imgs) > 1:
             imgs = user_imgs[1:]
             imgs = [img.convert("RGBA").square().resize((90, 90)) for img in imgs]
@@ -1692,11 +680,11 @@ class petpet(PBF):
                 except ValueError:
                     return TEXT_TOO_LONG
                 imgs.append(block)
-    
+
         imgs = sum([[img] * math.ceil(block_num / len(imgs)) for img in imgs], [])
         for i in range(block_num):
             frame.paste(imgs[i], (10 + 100 * i, 200))
-    
+
         try:
             frame.draw_text(
                 (10, 300, frame.width - 10, 390),
@@ -1708,9 +696,16 @@ class petpet(PBF):
             )
         except ValueError:
             return TEXT_TOO_LONG
-    
+
         self.save_and_send(frame)
 
+    @RegCmd(
+        name="舰长 ",
+        usage="舰长 <QQ号或@对方>",
+        permission="anyone",
+        description="舰长",
+        mode="表  情  包"
+    )
     def captain(self):
         sender_img = self.GetImage(self.data.se.get("user_id"))
         user_img = self.GetImage()
@@ -1718,20 +713,27 @@ class petpet(PBF):
         imgs.append(sender_img)
         imgs.append(user_img)
         imgs.append(user_img)
-        
+
         bg0 = load_image("captain/0.png")
         bg1 = load_image("captain/1.png")
         bg2 = load_image("captain/2.png")
-    
+
         frame = BuildImage.new("RGBA", (640, 440 * len(imgs)), "white")
         for i in range(len(imgs)):
             bg = bg0 if i < len(imgs) - 2 else bg1 if i == len(imgs) - 2 else bg2
             imgs[i] = imgs[i].convert("RGBA").square().resize((250, 250))
             bg = bg.copy().paste(imgs[i], (350, 85))
             frame.paste(bg, (0, 440 * i))
-    
+
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="看图标 ",
+        usage="看图标 <QQ号或@对方>",
+        permission="anyone",
+        description="看图标",
+        mode="表  情  包"
+    )
     def look_this_icon(self):
         img = self.GetImage()
         text = self.GetArgs() or "朋友\n先看看这个图标再说话"
@@ -1747,13 +749,20 @@ class petpet(PBF):
             )
         except ValueError:
             return TEXT_TOO_LONG
-    
+
         def make(img: BuildImage) -> BuildImage:
             img = img.convert("RGBA").resize((515, 515), keep_ratio=True)
             return frame.copy().paste(img, (599, 403), below=True)
-    
+
         self.make_jpg_or_gif(img, make)
-    
+
+    @RegCmd(
+        name="看扁 ",
+        usage="看扁 <QQ号或@对方>[ <附加内容，文字内容和拉扁比例>]",
+        permission="anyone",
+        description="看扁",
+        mode="表  情  包"
+    )
     def look_flat(self):
         img = self.GetImage()
         args = self.GetArgs().split()
@@ -1766,7 +775,7 @@ class petpet(PBF):
                     ratio = 2
             elif arg:
                 text = arg
-    
+
         img_w = 500
         text_h = 80
         text_frame = BuildImage.new("RGBA", (img_w, text_h), "white")
@@ -1780,30 +789,51 @@ class petpet(PBF):
             )
         except ValueError:
             return TEXT_TOO_LONG
-    
+
         def make(img: BuildImage) -> BuildImage:
             img = img.convert("RGBA").resize_width(img_w)
             img = img.resize((img_w, img.height // ratio))
             img_h = img.height
             frame = BuildImage.new("RGBA", (img_w, img_h + text_h), "white")
             return frame.paste(img, alpha=True).paste(text_frame, (0, img_h), alpha=True)
-    
+
         self.make_jpg_or_gif(img, make)
-    
+
+    @RegCmd(
+        name="抱紧 ",
+        usage="抱紧 <QQ号或@对方>",
+        permission="anyone",
+        description="抱紧",
+        mode="表  情  包"
+    )
     def hold_tight(self):
         img = self.GetImage()
         img = img.convert("RGBA").resize((159, 171), keep_ratio=True)
         frame = load_image("hold_tight/0.png")
         frame.paste(img, (113, 205), below=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="无响应 ",
+        usage="无响应 <QQ号或@对方>",
+        permission="anyone",
+        description="无响应",
+        mode="表  情  包"
+    )
     def no_response(self):
         img = self.GetImage()
         img = img.convert("RGBA").resize((1050, 783), keep_ratio=True)
         frame = load_image("no_response/0.png")
         frame.paste(img, (0, 581), below=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="唐可可举牌 ",
+        usage="唐可可举牌 <QQ号或@对方>",
+        permission="anyone",
+        description="唐可可举牌",
+        mode="表  情  包"
+    )
     def tankuku_holdsign(self):
         img = self.GetImage()
         img = img.convert("RGBA").resize((300, 230), keep_ratio=True)
@@ -1831,7 +861,14 @@ class petpet(PBF):
             frame.paste(img.perspective(points), pos, below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.2)
-    
+
+    @RegCmd(
+        name="抱大腿 ",
+        usage="抱大腿 <QQ号或@对方>",
+        permission="anyone",
+        description="抱大腿",
+        mode="表  情  包"
+    )
     def hug_leg(self):
         img = self.GetImage()
         img = img.convert("RGBA").square()
@@ -1850,7 +887,14 @@ class petpet(PBF):
             frame.paste(img.resize((w, h)), (x, y), below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.06)
-    
+
+    @RegCmd(
+        name="击剑 ",
+        usage="击剑 <QQ号或@对方>",
+        permission="anyone",
+        description="击剑",
+        mode="表  情  包"
+    )
     def fencing(self):
         self_img = self.GetImage(self.data.se.get("user_id"))
         user_img = self.GetImage()
@@ -1875,7 +919,14 @@ class petpet(PBF):
             frame.paste(self_head, self_locs[i], alpha=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.05)
-    
+
+    @RegCmd(
+        name="打穿 ",
+        usage="打穿 <QQ号或@对方>",
+        permission="anyone",
+        description="打穿",
+        mode="表  情  包"
+    )
     def hit_screen(self):
         img = self.GetImage()
         params = (
@@ -1896,7 +947,7 @@ class petpet(PBF):
             (((1, 12), (141, 1), (147, 130), (16, 150)), (11, 60)),
             (((1, 15), (165, 1), (175, 135), (1, 171)), (-6, 46)),
         )
-    
+
         def maker(i: int) -> Maker:
             def make(img: BuildImage) -> BuildImage:
                 img = img.resize((140, 120), keep_ratio=True)
@@ -1905,15 +956,22 @@ class petpet(PBF):
                     points, pos = params[i - 6]
                     frame.paste(img.perspective(points), pos, below=True)
                 return frame
-    
+
             return make
-    
+
         self.make_gif_or_combined_gif(img, maker, 29, 0.2, FrameAlignPolicy.extend_first)
-    
+
+    @RegCmd(
+        name="迷惑 ",
+        usage="迷惑 <QQ号或@对方>",
+        permission="anyone",
+        description="迷惑",
+        mode="表  情  包"
+    )
     def confuse(self):
         img = self.GetImage()
         img_w = min(img.width, 500)
-    
+
         def maker(i: int) -> Maker:
             def make(img: BuildImage) -> BuildImage:
                 img = img.resize_width(img_w)
@@ -1921,26 +979,40 @@ class petpet(PBF):
                 bg = BuildImage.new("RGB", img.size, "white")
                 bg.paste(img, alpha=True).paste(frame, alpha=True)
                 return bg
-    
+
             return make
-    
+
         self.make_gif_or_combined_gif(
             img, maker, 100, 0.02, FrameAlignPolicy.extend_loop, input_based=True
         )
-    
+
+    @RegCmd(
+        name="遇到困难请拨打 ",
+        usage="遇到困难请拨打 <QQ号或@对方>",
+        permission="anyone",
+        description="遇到困难请拨打",
+        mode="表  情  包"
+    )
     def call_110(self):
         img1 = self.GetImage(self.data.se.get("user_id"))
         img0 = self.GetImage()
         img1 = img1.convert("RGBA").square().resize((250, 250))
         img0 = img0.convert("RGBA").square().resize((250, 250))
-    
+
         frame = BuildImage.new("RGB", (900, 500), "white")
         frame.draw_text((0, 0, 900, 200), "遇到困难请拨打", max_fontsize=100)
         frame.paste(img1, (50, 200), alpha=True)
         frame.paste(img1, (325, 200), alpha=True)
         frame.paste(img0, (600, 200), alpha=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="看书 ",
+        usage="看书 <QQ号或@对方>[ <附加内容>]",
+        permission="anyone",
+        description="看书",
+        mode="表  情  包"
+    )
     def read_book(self):
         img = self.GetImage()
         arg = self.GetArgs()
@@ -1977,24 +1049,45 @@ class petpet(PBF):
             w, h = text_img.size
             frame.paste(text_img, (870 + (240 - w) // 2, 1500 + (780 - h) // 2), alpha=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="高血压 ",
+        usage="高血压 <QQ号或@对方>",
+        permission="anyone",
+        description="高血压",
+        mode="表  情  包"
+    )
     def blood_pressure(self):
         img = self.GetImage()
         frame = load_image("blood_pressure/0.png")
-    
+
         def make(img: BuildImage) -> BuildImage:
             return frame.copy().paste(
                 img.resize((414, 450), keep_ratio=True), (16, 17), below=True
             )
-    
+
         self.make_jpg_or_gif(img, make)
-    
+
+    @RegCmd(
+        name="手枪 ",
+        usage="手枪 <QQ号或@对方>",
+        permission="anyone",
+        description="手枪",
+        mode="表  情  包"
+    )
     def gun(self):
         img = self.GetImage()
         frame = load_image("gun/0.png")
         frame.paste(img.convert("RGBA").resize((500, 500), keep_ratio=True), below=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="上瘾 ",
+        usage="上瘾 <QQ号或@对方>",
+        permission="anyone",
+        description="上瘾",
+        mode="表  情  包"
+    )
     def addition(self):
         frame = load_image("addiction/0.png")
         img = self.GetImage()
@@ -2012,12 +1105,19 @@ class petpet(PBF):
             except ValueError:
                 return TEXT_TOO_LONG
             frame = expand_frame
-    
+
         def make(img: BuildImage) -> BuildImage:
             return frame.copy().paste(img.resize((70, 70), keep_ratio=True), (0, 0))
-    
+
         self.make_jpg_or_gif(img, make)
-    
+
+    @RegCmd(
+        name="敲黑板 ",
+        usage="敲黑板 <QQ号或@对方> <附加内容>",
+        permission="anyone",
+        description="敲黑板",
+        mode="表  情  包"
+    )
     def teach(self):
         img = self.GetImage()
         arg = self.GetArgs()
@@ -2033,14 +1133,21 @@ class petpet(PBF):
             )
         except ValueError:
             return TEXT_TOO_LONG
-    
+
         def make(img: BuildImage) -> BuildImage:
             return frame.copy().paste(
                 img.resize((550, 395), keep_ratio=True), (313, 60), below=True
             )
-    
+
         self.make_jpg_or_gif(img, make)
-    
+
+    @RegCmd(
+        name="胡桃放大 ",
+        usage="胡桃放大 <QQ号或@对方>",
+        permission="anyone",
+        description="胡桃放大",
+        mode="表  情  包"
+    )
     def walnut_zoom(self):
         img = self.GetImage()
         # fmt: off
@@ -2049,8 +1156,9 @@ class petpet(PBF):
             (-100, -67, 922, 570), (-172, -113, 1059, 655), (-273, -192, 1217, 753)
         )
         seq = [0, 0, 0, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 6, 6, 6, 6]
+
         # fmt: on
-    
+
         def maker(i: int) -> Maker:
             def make(img: BuildImage) -> BuildImage:
                 frame = load_image(f"walnut_zoom/{i}.png")
@@ -2058,28 +1166,42 @@ class petpet(PBF):
                 img = img.resize((w, h), keep_ratio=True).rotate(4.2, expand=True)
                 frame.paste(img, (x, y), below=True)
                 return frame
-    
+
             return make
-    
+
         self.make_gif_or_combined_gif(img, maker, 24, 0.2, FrameAlignPolicy.extend_last)
-    
+
+    @RegCmd(
+        name="胡桃平板 ",
+        usage="胡桃平板 <QQ号或@对方>",
+        permission="anyone",
+        description="胡桃平板",
+        mode="表  情  包"
+    )
     def walnutpad(self):
         img = self.GetImage()
         frame = load_image("walnutpad/0.png")
-    
+
         def make(img: BuildImage) -> BuildImage:
             return frame.copy().paste(
                 img.resize((540, 360), keep_ratio=True), (368, 65), below=True
             )
-    
+
         self.make_jpg_or_gif(img, make)
-    
+
+    @RegCmd(
+        name="我老婆 ",
+        usage="我老婆 <QQ号或@对方>",
+        permission="anyone",
+        description="我老婆",
+        mode="表  情  包"
+    )
     def mywife(self):
         img = self.GetImage().convert("RGBA").resize_width(400)
         img_w, img_h = img.size
         frame = BuildImage.new("RGBA", (650, img_h + 500), "white")
         frame.paste(img, (int(325 - img_w / 2), 105), alpha=True)
-    
+
         text = "如果你的老婆长这样"
         frame.draw_text(
             (27, 12, 27 + 596, 12 + 79),
@@ -2109,18 +1231,25 @@ class petpet(PBF):
             lines_align="center",
             weight="bold",
         )
-    
+
         img_point = load_image("mywife/1.png").resize_width(200)
         frame.paste(img_point, (421, img_h + 270))
-    
+
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="字符画 ",
+        usage="字符画 <QQ号或@对方>",
+        permission="anyone",
+        description="字符画",
+        mode="表  情  包"
+    )
     def charpic(self):
         img = self.GetImage()
         str_map = "@@$$&B88QMMGW##EE93SPPDOOU**==()+^,\"--''.  "
         num = len(str_map)
         font = Font.find("Consolas").load_font(15)
-    
+
         def make(img: BuildImage) -> BuildImage:
             img = img.convert("L").resize_width(150)
             img = img.resize((img.width, img.height // 2))
@@ -2137,9 +1266,16 @@ class petpet(PBF):
             draw = ImageDraw.Draw(text_img)
             draw.multiline_text((0, 0), text, font=font, fill="black")
             return BuildImage(text_img)
-    
+
         self.make_jpg_or_gif(img, make)
-    
+
+    @RegCmd(
+        name="防诱拐 ",
+        usage="防诱拐 <QQ号或@对方>",
+        permission="anyone",
+        description="防诱拐",
+        mode="表  情  包"
+    )
     def anti_kidnap(self):
         img = self.GetImage()
         img = img.convert("RGBA").circle().resize((450, 450))
@@ -2148,32 +1284,32 @@ class petpet(PBF):
         frame.paste(img, (30, 78))
         frame.paste(bg, alpha=True)
         self.save_and_send(frame)
-    
+
     def make_gif(
-        self,
-        filename: str,
-        pieces: Tuple[Tuple[int, int], ...],
-        examples: Tuple[str, ...],
-        fontsize: int = 20,
-        padding_x: int = 5,
-        padding_y: int = 5,
+            self,
+            filename: str,
+            pieces: Tuple[Tuple[int, int], ...],
+            examples: Tuple[str, ...],
+            fontsize: int = 20,
+            padding_x: int = 5,
+            padding_y: int = 5,
     ):
-        texts = self.data.args[1:len(pieces)+1]
+        texts = self.data.args[1:len(pieces) + 1]
         self.client.msg().raw("[CQ:reply,id={}] 玩命生成中...".format(self.data.se.get("message_id")))
         if not texts:
             texts = list(examples)
             self.client.msg().raw('您没有指定台词，将使用默认台词生成。默认台词：{}'.format(' '.join(texts)))
-    
+
         if len(texts) != len(pieces):
             return self.client.msg().raw(f"该表情包需要加{len(pieces)}段文字，不加可查看示例图片")
-    
+
         img = BuildImage.open(f"./resources/images/gif/{filename}").image
         frames: List[BuildImage] = []
         # self.send(dir(img))
         for i in range(img.n_frames):
             img.seek(i)
             frames.append(BuildImage(img.convert("RGB")))
-    
+
         parts = [frames[start:end] for start, end in pieces]
         for part, text in zip(parts, texts):
             for frame in part:
@@ -2190,21 +1326,28 @@ class petpet(PBF):
                     )
                 except ValueError:
                     return self.client.msg().raw("<{}>这段话太长了～".format(text))
-    
+
         self.save_gif([frame.image for frame in frames], img.info["duration"] / 1000)
-    
+
     def gif_func(
-        self,
-        filename: str,
-        pieces: Tuple[Tuple[int, int], ...],
-        examples: Tuple[str, ...],
-        **kwargs,
+            self,
+            filename: str,
+            pieces: Tuple[Tuple[int, int], ...],
+            examples: Tuple[str, ...],
+            **kwargs,
     ):
         try:
             self.make_gif(filename=filename, pieces=pieces, examples=examples, **kwargs)
         except Exception:
             self.client.msg().raw(traceback.format_exc())
-    
+
+    @RegCmd(
+        name="王境泽",
+        usage="王境泽 <台词，空格间隔>",
+        permission="anyone",
+        description="wangjingze",
+        mode="文字表情"
+    )
     def wangjingze(self):
         self.gif_func(
             "wangjingze.gif",
@@ -2212,14 +1355,29 @@ class petpet(PBF):
             ("我就是饿死", "死外边 从这里跳下去", "不会吃你们一点东西", "真香"),
         )
 
+    @RegCmd(
+        name="为所欲为",
+        usage="为所欲为 <台词，空格间隔>",
+        permission="anyone",
+        description="weisuoyuwei",
+        mode="文字表情"
+    )
     def weisuoyuwei(self):
         self.gif_func(
             "weisuoyuwei.gif",
             ((11, 14), (27, 38), (42, 61), (63, 81), (82, 95), (96, 105), (111, 131), (145, 157), (157, 167),),
-            ("好啊", "就算你是一流工程师", "就算你出报告再完美", "我叫你改报告你就要改", "毕竟我是客户", "客户了不起啊", "Sorry 客户真的了不起", "以后叫他天天改报告", "天天改 天天改"),
+            ("好啊", "就算你是一流工程师", "就算你出报告再完美", "我叫你改报告你就要改", "毕竟我是客户",
+             "客户了不起啊", "Sorry 客户真的了不起", "以后叫他天天改报告", "天天改 天天改"),
             fontsize=19,
         )
 
+    @RegCmd(
+        name="馋身子",
+        usage="馋身子 <台词，空格间隔>",
+        permission="anyone",
+        description="馋身子",
+        mode="文字表情"
+    )
     def chanshenzi(self):
         self.gif_func(
             "chanshenzi.gif",
@@ -2228,13 +1386,28 @@ class petpet(PBF):
             fontsize=18,
         )
 
+    @RegCmd(
+        name="切格瓦拉",
+        usage="切格瓦拉 <台词，空格间隔>",
+        permission="anyone",
+        description="切格瓦拉",
+        mode="文字表情"
+    )
     def qiegewala(self):
         self.gif_func(
             "qiegewala.gif",
             ((0, 15), (16, 31), (31, 38), (38, 48), (49, 68), (68, 86)),
-            ("没有钱啊 肯定要做的啊", "不做的话没有钱用", "那你不会去打工啊", "有手有脚的", "打工是不可能打工的", "这辈子不可能打工的"),
+            ("没有钱啊 肯定要做的啊", "不做的话没有钱用", "那你不会去打工啊", "有手有脚的", "打工是不可能打工的",
+             "这辈子不可能打工的"),
         )
 
+    @RegCmd(
+        name="谁反对",
+        usage="谁反对 <台词，空格间隔>",
+        permission="anyone",
+        description="谁反对",
+        mode="文字表情"
+    )
     def shuifandui(self):
         self.gif_func(
             "shuifandui.gif",
@@ -2243,6 +1416,13 @@ class petpet(PBF):
             fontsize=19,
         )
 
+    @RegCmd(
+        name="曾小贤",
+        usage="曾小贤 <台词，空格间隔>",
+        permission="anyone",
+        description="曾小贤",
+        mode="文字表情"
+    )
     def zengxiaoxian(self):
         self.gif_func(
             "zengxiaoxian.gif",
@@ -2251,6 +1431,13 @@ class petpet(PBF):
             fontsize=21,
         )
 
+    @RegCmd(
+        name="压力大爷",
+        usage="压力大爷 <台词，空格间隔>",
+        permission="anyone",
+        description="压力大爷",
+        mode="文字表情"
+    )
     def yalidaye(self):
         self.gif_func(
             "yalidaye.gif",
@@ -2259,6 +1446,13 @@ class petpet(PBF):
             fontsize=21,
         )
 
+    @RegCmd(
+        name="你好骚啊",
+        usage="你好骚啊 <台词，空格间隔>",
+        permission="anyone",
+        description="你好骚啊",
+        mode="文字表情"
+    )
     def nihaosaoa(self):
         self.gif_func(
             "nihaosaoa.gif",
@@ -2267,6 +1461,13 @@ class petpet(PBF):
             fontsize=17,
         )
 
+    @RegCmd(
+        name="食屎啦你",
+        usage="食屎啦你 <台词，空格间隔>",
+        permission="anyone",
+        description="食屎啦你",
+        mode="文字表情"
+    )
     def shishilani(self):
         self.gif_func(
             "shishilani.gif",
@@ -2275,6 +1476,13 @@ class petpet(PBF):
             fontsize=17,
         )
 
+    @RegCmd(
+        name="五年怎么过的",
+        usage="五年怎么过的 <台词，空格间隔>",
+        permission="anyone",
+        description="五年怎么过的",
+        mode="文字表情"
+    )
     def wunian(self):
         self.gif_func(
             "wunian.gif",
@@ -2283,6 +1491,13 @@ class petpet(PBF):
             fontsize=16,
         )
 
+    @RegCmd(
+        name="5000兆 ",
+        usage="5000兆 <内容1> <内容2>",
+        permission="anyone",
+        description="5000兆",
+        mode="文字表情"
+    )
     def fivethousand_choyen(self):
         texts = self.data.args[1:3]
         fontsize = 200
@@ -2291,7 +1506,7 @@ class petpet(PBF):
         pos_x = 40
         pos_y = 220
         imgs: List[Tuple[IMG, Tuple[int, int]]] = []
-    
+
         def transform(img: IMG) -> IMG:
             skew = 0.45
             dw = round(img.height * skew)
@@ -2301,7 +1516,7 @@ class petpet(PBF):
                 (1, skew, -dw, 0, 1, 0),
                 Image.BILINEAR,
             )
-    
+
         def shift(t2m: Text2Image) -> Tuple[int, int]:
             return (
                 pos_x
@@ -2309,19 +1524,19 @@ class petpet(PBF):
                 - max(char.stroke_width for char in t2m.lines[0].chars),
                 pos_y - t2m.lines[0].ascent,
             )
-    
+
         def add_color_text(stroke_width: int, fill: str, pos: Tuple[int, int]):
             t2m = Text2Image.from_text(
                 text, fontsize, fontname=fontname, stroke_width=stroke_width, fill=fill
             )
             dx, dy = shift(t2m)
             imgs.append((transform(t2m.to_image()), (dx + pos[0], dy + pos[1])))
-    
+
         def add_gradient_text(
-            stroke_width: int,
-            dir: Tuple[int, int, int, int],
-            color_stops: List[Tuple[float, Tuple[int, int, int]]],
-            pos: Tuple[int, int],
+                stroke_width: int,
+                dir: Tuple[int, int, int, int],
+                color_stops: List[Tuple[float, Tuple[int, int, int]]],
+                pos: Tuple[int, int],
         ):
             t2m = Text2Image.from_text(
                 text, fontsize, fontname=fontname, stroke_width=stroke_width, fill="white"
@@ -2335,7 +1550,7 @@ class petpet(PBF):
             bg = gradient.create_image(mask.size)
             bg.putalpha(mask)
             imgs.append((bg, (dx + pos[0], dy + pos[1])))
-    
+
         # 黑
         add_color_text(22, "black", (8, 8))
         # 银
@@ -2400,7 +1615,7 @@ class petpet(PBF):
             ],
             (0, -6),
         )
-    
+
         text = texts[1]
         fontname = "Noto Serif SC"
         pos_x = 300
@@ -2455,14 +1670,21 @@ class petpet(PBF):
             ],
             (0, -6),
         )
-    
+
         img_h = 580
         img_w = max([img.width + pos[0] for img, pos in imgs])
         frame = BuildImage.new("RGBA", (img_w, img_h), "white")
         for img, pos in imgs:
             frame.paste(img, pos, alpha=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="google ",
+        usage="google <内容>",
+        permission="anyone",
+        description="google",
+        mode="文字表情"
+    )
     def google(self):
         text = self.data.message
         text = " ".join(text.splitlines())
@@ -2474,13 +1696,20 @@ class petpet(PBF):
             if char.char.strip():
                 index += 1
         self.save_and_send(BuildImage(t2m.to_image(bg_color="white", padding=(50, 50))))
-    
+
+    @RegCmd(
+        name="youtube ",
+        usage="youtube <内容1> <内容2>",
+        permission="anyone",
+        description="youtube",
+        mode="文字表情"
+    )
     def youtube(self):
         texts = self.data.args[1:3]
         left_img = Text2Image.from_text(texts[0], fontsize=200, fill="black").to_image(
             bg_color="white", padding=(30, 20)
         )
-    
+
         right_img = Text2Image.from_text(
             texts[1], fontsize=200, fill="white", weight="bold"
         ).to_image(bg_color=(230, 33, 23), padding=(50, 20))
@@ -2488,7 +1717,7 @@ class petpet(PBF):
             (max(right_img.width, 400), right_img.height), bg_color=(230, 33, 23)
         )
         right_img = right_img.circle_corner(right_img.height // 2)
-    
+
         frame = BuildImage.new(
             "RGBA",
             (left_img.width + right_img.width, max(left_img.height, right_img.height)),
@@ -2498,7 +1727,7 @@ class petpet(PBF):
         frame = frame.resize_canvas(
             (frame.width + 100, frame.height + 100), bg_color="white"
         )
-    
+
         corner = load_image("youtube/corner.png")
         ratio = right_img.height / 2 / corner.height
         corner = corner.resize((int(corner.width * ratio), int(corner.height * ratio)))
@@ -2516,18 +1745,25 @@ class petpet(PBF):
             right_img, (x0, y0), alpha=True
         )
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="pornhub ",
+        usage="pornhub <内容1> <内容2>",
+        permission="anyone",
+        description="pornhub",
+        mode="文字表情"
+    )
     def pornhub(self):
         texts = self.data.args[1:3]
         left_img = Text2Image.from_text(texts[0], fontsize=200, fill="white").to_image(
             bg_color="black", padding=(20, 10)
         )
-    
+
         right_img = Text2Image.from_text(
             texts[1], fontsize=200, fill="black", weight="bold"
         ).to_image(bg_color=(247, 152, 23), padding=(20, 10))
         right_img = BuildImage(right_img).circle_corner(20)
-    
+
         frame = BuildImage.new(
             "RGBA",
             (left_img.width + right_img.width, max(left_img.height, right_img.height)),
@@ -2540,7 +1776,14 @@ class petpet(PBF):
             (frame.width + 100, frame.height + 100), bg_color="black"
         )
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="大鸭鸭举牌 ",
+        usage="大鸭鸭举牌 <内容>",
+        permission="anyone",
+        description="大鸭鸭举牌",
+        mode="文字表情"
+    )
     def bronya_holdsign(self):
         text = self.data.message
         frame = load_image("bronya_holdsign/0.jpg")
@@ -2556,14 +1799,21 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="整点薯条 ",
+        usage="整点薯条 <内容，四个参数，空格隔开>",
+        permission="anyone",
+        description="整点薯条",
+        mode="文字表情"
+    )
     def findchips(self):
         texts = self.data.args[1:5]
         frame = load_image("findchips/0.jpg")
-    
+
         def draw(pos: Tuple[float, float, float, float], text: str):
             frame.draw_text(pos, text, max_fontsize=40, min_fontsize=20, allow_wrap=True)
-    
+
         try:
             draw((405, 54, 530, 130), texts[0])
             draw((570, 62, 667, 160), texts[1])
@@ -2572,7 +1822,14 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="许愿失败 ",
+        usage="许愿失败 <内容>",
+        permission="anyone",
+        description="许愿失败",
+        mode="文字表情"
+    )
     def wish_fail(self):
         text = self.data.message
         frame = load_image("wish_fail/0.png")
@@ -2587,7 +1844,14 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="流星 ",
+        usage="流星 <内容>",
+        permission="anyone",
+        description="流星",
+        mode="文字表情"
+    )
     def meteor(self):
         text = self.data.message
         frame = load_image("meteor/0.png")
@@ -2603,7 +1867,14 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="快跑 ",
+        usage="快跑 <内容>",
+        permission="anyone",
+        description="口号",
+        mode="文字表情"
+    )
     def run(self):
         text = self.data.message
         frame = load_image("run/0.png")
@@ -2621,7 +1892,14 @@ class petpet(PBF):
             return OVER_LENGTH_MSG
         frame.paste(text_img.rotate(7, expand=True), (200, 195), alpha=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="升天 ",
+        usage="升天 <内容>",
+        permission="anyone",
+        description="升天",
+        mode="文字表情"
+    )
     def ascension(self):
         text = self.data.message
         frame = load_image("ascension/0.png")
@@ -2637,7 +1915,14 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="刮刮乐 ",
+        usage="刮刮乐 <内容>",
+        permission="anyone",
+        description="刮刮乐",
+        mode="文字表情"
+    )
     def scratchoff(self):
         text = self.data.message
         frame = load_image("scratchoff/0.png")
@@ -2656,12 +1941,19 @@ class petpet(PBF):
         mask = load_image("scratchoff/1.png")
         frame.paste(mask, alpha=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="可达鸭 ",
+        usage="可达鸭 <内容1> <内容2>",
+        permission="anyone",
+        description="可达鸭",
+        mode="文字表情"
+    )
     def psyduck(self):
         texts = self.data.args[1:3]
         left_img = BuildImage.new("RGBA", (155, 100))
         right_img = BuildImage.new("RGBA", (155, 100))
-    
+
         def draw(frame: BuildImage, text: str):
             frame.draw_text(
                 (5, 5, 150, 95),
@@ -2671,7 +1963,7 @@ class petpet(PBF):
                 allow_wrap=True,
                 fontname="FZSJ-QINGCRJ",
             )
-    
+
         try:
             draw(left_img, texts[0])
             draw(right_img, texts[1])
@@ -2679,7 +1971,7 @@ class petpet(PBF):
             return OVER_LENGTH_MSG
         except Exception:
             return self.send("该指令需要两个参数，以空格隔开")
-    
+
         params = [
             ("left", ((0, 11), (154, 0), (161, 89), (20, 104)), (18, 42)),
             ("left", ((0, 9), (153, 0), (159, 89), (20, 101)), (15, 38)),
@@ -2700,7 +1992,7 @@ class petpet(PBF):
             ("left", ((0, 14), (152, 0), (156, 91), (17, 115)), (40, 27)),
             ("left", ((0, 12), (154, 0), (158, 90), (17, 109)), (35, 28)),
         ]
-    
+
         frames: List[IMG] = []
         for i in range(18):
             frame = load_image(f"psyduck/{i}.jpg")
@@ -2713,7 +2005,14 @@ class petpet(PBF):
                     frame.paste(right_img.perspective(points), pos, alpha=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.2)
-    
+
+    @RegCmd(
+        name="举牌 ",
+        usage="举牌 <内容>",
+        permission="anyone",
+        description="举牌子",
+        mode="文字表情"
+    )
     def raisesign(self):
         text = self.data.message
         frame = load_image("raisesign/0.jpg")
@@ -2735,7 +2034,14 @@ class petpet(PBF):
         text_img = text_img.perspective(((33, 0), (375, 120), (333, 387), (0, 258)))
         frame.paste(text_img, (285, 24), alpha=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="起来了 ",
+        usage="起来了 <内容>",
+        permission="anyone",
+        description="起来了",
+        mode="文字表情"
+    )
     def wakeup(self):
         text = self.data.message
         frame = load_image("wakeup/0.jpg")
@@ -2747,7 +2053,14 @@ class petpet(PBF):
         except ValueError:
             return
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="douyin ",
+        usage="douyin <内容>",
+        permission="anyone",
+        description="douyin",
+        mode="文字表情"
+    )
     def douyin(self):
         text = self.data.message
         text = " ".join(text.splitlines())
@@ -2766,7 +2079,7 @@ class petpet(PBF):
             text, fontsize, fill="white", stroke_fill="white", stroke_width=5
         ).draw_on_image(frame, (px + offset, py + offset))
         frame = BuildImage(frame)
-    
+
         width = frame.width - px
         height = frame.height - py
         frame_num = 10
@@ -2803,9 +2116,16 @@ class petpet(PBF):
             bg = BuildImage.new("RGBA", new_frame.size, bg_color)
             bg.paste(new_frame, alpha=True)
             frames.append(bg.image)
-    
+
         self.save_gif(frames, 0.2)
-    
+
+    @RegCmd(
+        name="不喊我 ",
+        usage="不喊我 <内容>",
+        permission="anyone",
+        description="5000兆",
+        mode="文字表情"
+    )
     def not_call_me(self):
         text = self.data.message
         frame = load_image("not_call_me/0.png")
@@ -2820,14 +2140,21 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="口号 ",
+        usage="口号 <内容，至少6条，空格间隔>",
+        permission="anyone",
+        description="口号",
+        mode="文字表情"
+    )
     def slogan(self):
         texts = self.data.args[1:7]
         frame = load_image("slogan/0.jpg")
-    
+
         def draw(pos: Tuple[float, float, float, float], text: str):
             frame.draw_text(pos, text, max_fontsize=40, min_fontsize=15, allow_wrap=True)
-    
+
         try:
             draw((10, 0, 294, 50), texts[0])
             draw((316, 0, 602, 50), texts[1])
@@ -2840,16 +2167,23 @@ class petpet(PBF):
         except Exception:
             return self.client.msg().raw("需要6个参数，以空格隔开哦")
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="吴京 ",
+        usage="吴京 <吴京内容> <中国内容>",
+        permission="anyone",
+        description="吴京xx中国xx",
+        mode="文字表情"
+    )
     def wujing(self):
         left = self.data.args[1]
         right = self.data.args[2]
         frame = load_image("wujing/0.jpg")
-    
+
         def draw(
-            pos: Tuple[float, float, float, float],
-            text: str,
-            align: Literal["left", "right", "center"],
+                pos: Tuple[float, float, float, float],
+                text: str,
+                align: Literal["left", "right", "center"],
         ):
             frame.draw_text(
                 pos,
@@ -2861,7 +2195,7 @@ class petpet(PBF):
                 stroke_fill="black",
                 stroke_ratio=0.05,
             )
-    
+
         try:
             if left:
                 parts = left.split()
@@ -2876,12 +2210,19 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="情商 ",
+        usage="情商 <低情商内容> <高情商内容>",
+        permission="anyone",
+        description="情商姐",
+        mode="文字表情"
+    )
     def high_EQ(self):
         left = self.data.args[1]
         right = self.data.args[2]
         frame = load_image("high_EQ/0.jpg")
-    
+
         def draw(pos: Tuple[float, float, float, float], text: str):
             frame.draw_text(
                 pos,
@@ -2893,14 +2234,21 @@ class petpet(PBF):
                 stroke_fill="black",
                 stroke_ratio=0.05,
             )
-    
+
         try:
             draw((40, 540, 602, 1140), left)
             draw((682, 540, 1244, 1140), right)
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="一巴掌 ",
+        usage="一巴掌 <内容>",
+        permission="anyone",
+        description="一巴掌...",
+        mode="文字表情"
+    )
     def slap(self):
         text = self.data.message
         frame = load_image("slap/0.jpg")
@@ -2915,8 +2263,14 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
-    
+
+    @RegCmd(
+        name="坐牢 ",
+        usage="坐牢 <内容>",
+        permission="anyone",
+        description="坐牢...",
+        mode="文字表情"
+    )
     def imprison(self):
         text = self.data.message
         frame = load_image("imprison/0.jpg")
@@ -2931,8 +2285,14 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
-    
+
+    @RegCmd(
+        name="滚屏 ",
+        usage="滚屏 <内容>",
+        permission="anyone",
+        description="滚屏...",
+        mode="文字表情"
+    )
     def scroll(self):
         text = self.data.message
         text2image = Text2Image.from_text(text, 40).wrap(600)
@@ -2940,7 +2300,7 @@ class petpet(PBF):
             return OVER_LENGTH_MSG
         text_img = text2image.to_image()
         text_w, text_h = text_img.size
-    
+
         box_w = text_w + 140
         box_h = max(text_h + 103, 150)
         box = BuildImage.new("RGBA", (box_w, box_h), "#eaedf4")
@@ -2955,11 +2315,11 @@ class petpet(PBF):
         box.paste(BuildImage.new("RGBA", (text_w, box_h - 40), "white"), (70, 20))
         box.paste(BuildImage.new("RGBA", (text_w + 88, box_h - 150), "white"), (27, 75))
         box.paste(text_img, (70, 17 + (box_h - 40 - text_h) // 2), alpha=True)
-    
+
         dialog = BuildImage.new("RGBA", (box_w, box_h * 4), "#eaedf4")
         for i in range(4):
             dialog.paste(box, (0, box_h * i))
-    
+
         frames: List[IMG] = []
         num = 30
         dy = int(dialog.height / num)
@@ -2969,7 +2329,14 @@ class petpet(PBF):
             frame.paste(dialog, (0, dialog.height - dy * i))
             frames.append(frame.image)
         self.save_gif(frames, 0.05)
-    
+
+    @RegCmd(
+        name="别说了 ",
+        usage="别说了 <内容>",
+        permission="anyone",
+        description="别说了...",
+        mode="文字表情"
+    )
     def shutup(self):
         text = self.data.message
         frame = load_image("shutup/0.jpg")
@@ -2984,7 +2351,14 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="低语 ",
+        usage="低语 <内容>",
+        permission="anyone",
+        description="低语",
+        mode="文字表情"
+    )
     def murmur(self):
         text = self.data.message
         frame = load_image("murmur/0.png")
@@ -2998,7 +2372,14 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="狂爱 ",
+        usage="狂爱 <内容>",
+        permission="anyone",
+        description="狂粉",
+        mode="文字表情"
+    )
     def fanatic(self):
         text = self.data.message
         frame = load_image("fanatic/0.jpg")
@@ -3014,7 +2395,14 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="悲报 ",
+        usage="悲报 <内容>",
+        permission="anyone",
+        description="悲报",
+        mode="文字表情"
+    )
     def badnews(self):
         text = self.data.message
         frame = load_image("badnews/0.png")
@@ -3033,7 +2421,14 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="记仇 ",
+        usage="记仇 <内容>",
+        permission="anyone",
+        description="这仇我记下了...",
+        mode="文字表情"
+    )
     def holdgrudge(self):
         text = self.data.message
         date = datetime.today().strftime("%Y{}%m{}%d{}").format("年", "月", "日")
@@ -3042,14 +2437,21 @@ class petpet(PBF):
         if len(text2image.lines) > 10:
             return OVER_LENGTH_MSG
         text_img = text2image.to_image()
-    
+
         frame = load_image("holdgrudge/0.png")
         bg = BuildImage.new(
             "RGB", (frame.width, frame.height + text_img.height + 20), "white"
         )
         bg.paste(frame).paste(text_img, (30, frame.height + 5), alpha=True)
         self.save_and_send(bg)
-    
+
+    @RegCmd(
+        name="喜报 ",
+        usage="喜报 <内容>",
+        permission="anyone",
+        description="喜报",
+        mode="文字表情"
+    )
     def goodnews(self):
         text = self.data.message
         frame = load_image("goodnews/0.jpg")
@@ -3068,7 +2470,14 @@ class petpet(PBF):
         except ValueError:
             return OVER_LENGTH_MSG
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="诺基亚 ",
+        usage="诺基亚 <内容>",
+        permission="anyone",
+        description="有内鬼，停止交易",
+        mode="文字表情"
+    )
     def nokia(self):
         text = self.data.message[:900]
         text_img = (
@@ -3081,17 +2490,24 @@ class petpet(PBF):
             .resize_canvas((700, 450), direction="northwest")
             .rotate(-9.3, expand=True)
         )
-    
+
         head_img = Text2Image.from_text(
             f"{len(text)}/900", 70, fontname="FZXS14", fill=(129, 212, 250, 255)
         ).to_image()
         head_img = BuildImage(head_img).rotate(-9.3, expand=True)
-    
+
         frame = load_image("nokia/0.jpg")
         frame.paste(text_img, (205, 330), alpha=True)
         frame.paste(head_img, (790, 320), alpha=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="鲁迅说 ",
+        usage="鲁迅说 <内容>",
+        permission="anyone",
+        description="鲁迅说过？",
+        mode="文字表情"
+    )
     def luxunsay(self):
         text = self.data.message
         frame = load_image("luxunsay/0.jpg")
@@ -3109,11 +2525,18 @@ class petpet(PBF):
         luxun_text = Text2Image.from_text("--鲁迅", 30, fill="white").to_image()
         frame.paste(luxun_text, (320, 400), alpha=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="摸 ",
+        usage="摸 <QQ号或@对方>",
+        permission="anyone",
+        description="生成摸头像的表情包",
+        mode="表  情  包"
+    )
     def petpet(self):
         img = self.GetImage()
         img = img.convert("RGBA").square().circle()
-    
+
         frames: List[IMG] = []
         locs = [
             (14, 20, 98, 98),
@@ -3130,7 +2553,14 @@ class petpet(PBF):
             frame.paste(hand, alpha=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.06)
-    
+
+    @RegCmd(
+        name="滚 ",
+        usage="滚 <QQ号或@对方>",
+        permission="anyone",
+        description="滚某个人的头像",
+        mode="表  情  包"
+    )
     def roll(self):
         img = self.GetImage()
         img = img.convert("RGBA").square().resize((210, 210))
@@ -3147,28 +2577,35 @@ class petpet(PBF):
             frame.paste(img.rotate(a), (x, y), below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.06)
-        
+
+    @RegCmd(
+        name="小天使 ",
+        usage="小天使 <QQ号或@对方>",
+        permission="anyone",
+        description="生成小天使图片",
+        mode="表  情  包"
+    )
     def littleangel(self):
         userid = self.data.message
         if 'at' in userid:
             userid = CQCode(userid).get("qq")[0]
-        
+
         username = self.GetUserInfo(userid).get('nickname')
         img = self.GetImage().convert("RGBA").resize_width(500)
         img_w, img_h = img.size
         frame = BuildImage.new("RGBA", (600, img_h + 230), "white")
         frame.paste(img, (int(300 - img_w / 2), 110), alpha=True)
-    
+
         text = "非常可爱！简直就是小天使"
         frame.draw_text(
             (10, img_h + 120, 590, img_h + 185), text, max_fontsize=48, weight="bold"
         )
-    
+
         text = f"Ta没失踪也没怎么样  我只是觉得你们都该看一下"
         frame.draw_text(
             (20, img_h + 180, 580, img_h + 215), text, max_fontsize=26, weight="bold"
         )
-    
+
         text = f"请问你们看到{username}了吗?"
         try:
             frame.draw_text(
@@ -3176,24 +2613,38 @@ class petpet(PBF):
             )
         except ValueError:
             return self.send(NAME_TOO_LONG)
-    
+
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="警察 ",
+        usage="警察 <QQ号或@对方>",
+        permission="anyone",
+        description="出警！",
+        mode="表  情  包"
+    )
     def police1(self):
         img = self.GetImage()
         img = img.convert("RGBA").resize((60, 75), keep_ratio=True).rotate(16, expand=True)
         frame = self.load_image("police/1.png")
         frame.paste(img, (37, 291), below=True)
-    
+
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="兑换卷 ",
+        usage="兑换卷 <QQ号或@对方>",
+        permission="anyone",
+        description="XX陪睡兑换卷！",
+        mode="表  情  包"
+    )
     def coupon(self):
         userid = self.data.message
         if 'at' in userid:
             userid = CQCode(userid).get("qq")[0]
-        
+
         username = self.GetUserInfo(userid).get('nickname')
-        
+
         text = (f"{username}陪睡券") + "\n（永久有效）"
         text_img = BuildImage.new("RGBA", (250, 100))
         try:
@@ -3206,14 +2657,21 @@ class petpet(PBF):
             )
         except ValueError:
             return self.client.msg().raw(NAME_TOO_LONG)
-    
+
         frame = self.load_image("coupon/0.png")
         img = self.GetImage().convert("RGBA").circle().resize((60, 60)).rotate(22, expand=True)
         frame.paste(img, (164, 85), alpha=True)
         frame.paste(text_img.rotate(22, expand=True), (94, 108), alpha=True)
-        
+
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="听音乐 ",
+        usage="听音乐 <QQ号或@对方>",
+        permission="anyone",
+        description="听音乐！",
+        mode="表  情  包"
+    )
     def listen_music(self):
         img = self.GetImage().convert("RGBA")
         frame = self.load_image("listen_music/0.png")
@@ -3225,7 +2683,14 @@ class petpet(PBF):
                 .image
             )
         self.save_gif(frames, 0.05)
-        
+
+    @RegCmd(
+        name="扔 ",
+        usage="扔 <QQ号或@对方>",
+        permission="anyone",
+        description="扔某人的头像",
+        mode="表  情  包"
+    )
     def throw_gif(self):
         img = self.GetImage().convert("RGBA").circle()
         locs = [
@@ -3245,7 +2710,14 @@ class petpet(PBF):
                 frame.paste(img.resize((w, h)), (x, y), alpha=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.1)
-        
+
+    @RegCmd(
+        name="吃 ",
+        usage="吃 <QQ号或@对方>",
+        permission="anyone",
+        description="吃掉它！",
+        mode="表  情  包"
+    )
     def eat(self):
         img = self.GetImage().convert("RGBA").square().resize((32, 32))
         frames = []
@@ -3254,12 +2726,19 @@ class petpet(PBF):
             frame.paste(img, (1, 38), below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.05)
-        
+
+    @RegCmd(
+        name="我朋友说 ",
+        usage="我朋友说 <QQ号或@对方> <说的内容>",
+        permission="anyone",
+        description="我有个朋友说...",
+        mode="表  情  包"
+    )
     def my_friend(self):
         userid = self.data.args[1]
         if 'at' in userid:
             userid = CQCode(userid).get("qq")[0]
-        
+
         name = self.GetUserInfo(userid).get('nickname')
         texts = self.data.args[2]
         for i in self.data.args:
@@ -3267,18 +2746,18 @@ class petpet(PBF):
                 continue
             texts += " {0}".format(i)
         img = self.GetImage().convert("RGBA").circle().resize((100, 100))
-    
+
         name_img = Text2Image.from_text(name, 25, fill="#868894").to_image()
         name_w, name_h = name_img.size
         if name_w >= 700:
             raise ValueError(NAME_TOO_LONG)
-    
+
         corner1 = self.load_image("my_friend/corner1.png")
         corner2 = self.load_image("my_friend/corner2.png")
         corner3 = self.load_image("my_friend/corner3.png")
         corner4 = self.load_image("my_friend/corner4.png")
         label = self.load_image("my_friend/label.png")
-    
+
         def make_dialog(text: str) -> BuildImage:
             text_img = Text2Image.from_text(text, 40).wrap(700).to_image()
             text_w, text_h = text_img.size
@@ -3292,14 +2771,14 @@ class petpet(PBF):
             box.paste(BuildImage.new("RGBA", (text_w, box_h - 40), "white"), (70, 20))
             box.paste(BuildImage.new("RGBA", (text_w + 88, box_h - 150), "white"), (27, 75))
             box.paste(text_img, (70, 16 + (box_h - 40 - text_h) // 2), alpha=True)
-    
+
             dialog = BuildImage.new("RGBA", (box.width + 130, box.height + 60), "#eaedf4")
             dialog.paste(img, (20, 20), alpha=True)
             dialog.paste(box, (130, 60), alpha=True)
             dialog.paste(label, (160, 25))
             dialog.paste(name_img, (260, 22 + (35 - name_h) // 2), alpha=True)
             return dialog
-        
+
         if '|' in texts:
             texts = texts.split('|')
             dialogs = [make_dialog(text) for text in texts]
@@ -3313,7 +2792,14 @@ class petpet(PBF):
             frame.paste(dialog, (0, current_h))
             current_h += dialog.height
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="假冒伪劣 ",
+        usage="假冒伪劣 <昵称> <说的内容> <头像>",
+        permission="anyone",
+        description="生成对话图片",
+        mode="表  情  包"
+    )
     def make_dialog_picture(self):
         name = self.data.args[1]
         texts = self.data.args[2]
@@ -3322,20 +2808,20 @@ class petpet(PBF):
         # internal data file
         data_stream = BytesIO(image_bytes)
         # open as a PIL image object
-        #以一个PIL图像对象打开
+        # 以一个PIL图像对象打开
         img = BuildImage.open(data_stream).convert("RGBA").square().circle().resize((100, 100))
-    
+
         name_img = Text2Image.from_text(name, 25, fill="#868894").to_image()
         name_w, name_h = name_img.size
         if name_w >= 700:
             raise ValueError(NAME_TOO_LONG)
-    
+
         corner1 = self.load_image("my_friend/corner1.png")
         corner2 = self.load_image("my_friend/corner2.png")
         corner3 = self.load_image("my_friend/corner3.png")
         corner4 = self.load_image("my_friend/corner4.png")
         label = self.load_image("my_friend/label.png")
-    
+
         def make_dialog(text: str) -> BuildImage:
             text_img = Text2Image.from_text(text, 40).wrap(700).to_image()
             text_w, text_h = text_img.size
@@ -3349,14 +2835,14 @@ class petpet(PBF):
             box.paste(BuildImage.new("RGBA", (text_w, box_h - 40), "white"), (70, 20))
             box.paste(BuildImage.new("RGBA", (text_w + 88, box_h - 150), "white"), (27, 75))
             box.paste(text_img, (70, 16 + (box_h - 40 - text_h) // 2), alpha=True)
-    
+
             dialog = BuildImage.new("RGBA", (box.width + 130, box.height + 60), "#eaedf4")
             dialog.paste(img, (20, 20), alpha=True)
             dialog.paste(box, (130, 60), alpha=True)
             dialog.paste(label, (160, 25))
             dialog.paste(name_img, (260, 22 + (35 - name_h) // 2), alpha=True)
             return dialog
-        
+
         if '|' in texts:
             texts = texts.split('|')
             dialogs = [make_dialog(text) for text in texts]
@@ -3370,7 +2856,14 @@ class petpet(PBF):
             frame.paste(dialog, (0, current_h))
             current_h += dialog.height
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="亲 ",
+        usage="亲 <QQ号或@对方>",
+        permission="anyone",
+        description="亲Ta！",
+        mode="表  情  包"
+    )
     def kiss(self):
         user_head = self.GetImage().convert("RGBA").circle().resize((50, 50))
         self.data.message = str(self.data.se.get('user_id'))
@@ -3392,7 +2885,14 @@ class petpet(PBF):
             frame.paste(self_head, self_locs[i], alpha=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.05)
-    
+
+    @RegCmd(
+        name="贴贴 ",
+        usage="贴贴 <QQ号或@对方>",
+        permission="anyone",
+        description="贴贴对方！",
+        mode="表  情  包"
+    )
     def rub(self):
         user_head = self.GetImage().convert("RGBA").circle().resize((50, 50))
         self.data.message = str(self.data.se.get('user_id'))
@@ -3418,7 +2918,14 @@ class petpet(PBF):
             )
             frames.append(frame.image)
         self.save_gif(frames, 0.05)
-        
+
+    @RegCmd(
+        name="顶 ",
+        usage="顶 <QQ号或@对方>",
+        permission="anyone",
+        description="顶",
+        mode="表  情  包"
+    )
     def play(self):
         img = self.GetImage().convert("RGBA").square()
         # fmt: off
@@ -3439,15 +2946,22 @@ class petpet(PBF):
             frame.paste(img.resize((w, h)), (x, y), below=True)
             img_frames.append(frame)
         frames = (
-            img_frames[0:12]
-            + img_frames[0:12]
-            + img_frames[0:8]
-            + img_frames[12:18]
-            + raw_frames[18:23]
+                img_frames[0:12]
+                + img_frames[0:12]
+                + img_frames[0:8]
+                + img_frames[12:18]
+                + raw_frames[18:23]
         )
         frames = [frame.image for frame in frames]
         self.save_gif(frames, 0.06)
-    
+
+    @RegCmd(
+        name="拍 ",
+        usage="拍 <QQ号或@对方>",
+        permission="anyone",
+        description="拍",
+        mode="表  情  包"
+    )
     def pat(self):
         img = self.GetImage().convert("RGBA").square()
         locs = [(11, 73, 106, 100), (8, 79, 112, 96)]
@@ -3462,29 +2976,57 @@ class petpet(PBF):
         # fmt: on
         frames = [img_frames[n] for n in seq]
         return self.save_gif(frames, 0.085)
-    
+
+    @RegCmd(
+        name="撕 ",
+        usage="撕 <QQ号或@对方>",
+        permission="anyone",
+        description="撕",
+        mode="表  情  包"
+    )
     def rip(self):
         img = self.GetImage().convert("RGBA").square().resize((385, 385))
         frame = self.load_image("rip/0.png")
         frame.paste(img.rotate(24, expand=True), (-5, 355), below=True)
         frame.paste(img.rotate(-11, expand=True), (649, 310), below=True)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="爬 ",
+        usage="爬 <QQ号或@对方>",
+        permission="anyone",
+        description="爬",
+        mode="表  情  包"
+    )
     def crawl(self):
         total_num = 92
         num = random.randint(1, total_num)
-    
+
         img = self.GetImage().convert("RGBA").circle().resize((100, 100))
         frame = self.load_image(f"crawl/{num:02d}.jpg")
         frame.paste(img, (0, 400), alpha=True)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="精神支柱 ",
+        usage="精神支柱 <QQ号或@对方>",
+        permission="anyone",
+        description="精神支柱",
+        mode="表  情  包"
+    )
     def support(self):
         img = self.GetImage().convert("RGBA").square().resize((815, 815)).rotate(23, expand=True)
         frame = self.load_image("support/0.png")
         frame.paste(img, (-172, -17), below=True)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="一直 ",
+        usage="一直 <QQ号或@对方>",
+        permission="anyone",
+        description="一直",
+        mode="表  情  包"
+    )
     def always(self):
         def make(img: BuildImage) -> BuildImage:
             img_big = img.resize_width(500)
@@ -3500,9 +3042,16 @@ class petpet(PBF):
                 (400, h1 + 5, 480, h1 + h2 + 5), "吗", halign="left", max_fontsize=60
             )
             return frame
-    
+
         return self.make_jpg_or_gif(self.GetImage(), make)
-    
+
+    @RegCmd(
+        name="加载中 ",
+        usage="加载中 <QQ号或@对方>",
+        permission="anyone",
+        description="加载中",
+        mode="表  情  包"
+    )
     def loading(self):
         img = self.GetImage()
         img_big = img.convert("RGBA").resize_width(500)
@@ -3511,7 +3060,7 @@ class petpet(PBF):
         mask = BuildImage.new("RGBA", img_big.size, (0, 0, 0, 128))
         icon = self.load_image("loading/icon.png")
         img_big.paste(mask, alpha=True).paste(icon, (200, int(h1 / 2) - 50), alpha=True)
-    
+
         def make(img: BuildImage) -> BuildImage:
             img_small = img.resize_width(100)
             h2 = max(img_small.height, 80)
@@ -3521,9 +3070,16 @@ class petpet(PBF):
                 (210, h1 + 5, 480, h1 + h2 + 5), "不出来", halign="left", max_fontsize=60
             )
             return frame
-    
+
         return self.make_jpg_or_gif(img, make)
-        
+
+    @RegCmd(
+        name="转 ",
+        usage="转 <QQ号或@对方>",
+        permission="anyone",
+        description="转",
+        mode="表  情  包"
+    )
     def turn(self):
         img = self.GetImage().convert("RGBA").circle()
         frames: List[IMG] = []
@@ -3534,19 +3090,40 @@ class petpet(PBF):
         if random.randint(0, 1):
             frames.reverse()
         return self.save_gif(frames, 0.05)
-        
+
+    @RegCmd(
+        name="不要靠近 ",
+        usage="不要靠近 <QQ号或@对方>",
+        permission="anyone",
+        description="不要靠近",
+        mode="表  情  包"
+    )
     def dont_touch(self):
         img = self.GetImage().convert("RGBA").square().resize((170, 170))
         frame = self.load_image("dont_touch/0.png")
         frame.paste(img, (23, 231), alpha=True)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="一样 ",
+        usage="一样 <QQ号或@对方>",
+        permission="anyone",
+        description="一样",
+        mode="表  情  包"
+    )
     def alike(self):
         img = self.GetImage().convert("RGBA").square().resize((90, 90))
         frame = self.load_image("alike/0.png")
         frame.paste(img, (131, 14), alpha=True)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="玩游戏 ",
+        usage="玩游戏 <QQ号或@对方>",
+        permission="anyone",
+        description="玩游戏",
+        mode="表  情  包"
+    )
     def play_game(self):
         text = "来玩休闲游戏啊"
         frame = self.load_image("play_game/0.png")
@@ -3561,14 +3138,21 @@ class petpet(PBF):
             )
         except:
             return TEXT_TOO_LONG
-    
+
         def make(img: BuildImage) -> BuildImage:
             points = ((0, 5), (227, 0), (216, 150), (0, 165))
             screen = img.resize((220, 160), keep_ratio=True).perspective(points)
             return frame.copy().paste(screen.rotate(9, expand=True), (161, 117), below=True)
-    
+
         return self.make_jpg_or_gif(self.GetImage(), make)
-        
+
+    @RegCmd(
+        name="膜 ",
+        usage="膜 <QQ号或@对方>",
+        permission="anyone",
+        description="膜",
+        mode="表  情  包"
+    )
     def worship(self):
         img = self.GetImage().convert("RGBA")
         points = ((0, -30), (135, 17), (135, 145), (0, 140))
@@ -3579,14 +3163,21 @@ class petpet(PBF):
             frame.paste(paint, below=True)
             frames.append(frame.image)
         return self.save_gif(frames, 0.04)
-    
+
+    @RegCmd(
+        name="万能表情 ",
+        usage="万能表情 <QQ号或@对方> <附加文字>",
+        permission="anyone",
+        description="万能表情",
+        mode="表  情  包"
+    )
     def universal(self):
         args = self.data.args[2].split('|')
         img = self.GetImage()
-        
+
         if not args:
             args = ["在此处添加文字"]
-    
+
         def make(img: BuildImage) -> BuildImage:
             img = img.resize_width(500)
             frames: List[BuildImage] = [img]
@@ -3597,7 +3188,7 @@ class petpet(PBF):
                     .to_image()
                 )
                 frames.append(text_img.resize_canvas((500, text_img.height)))
-    
+
             frame = BuildImage.new(
                 "RGBA", (500, sum((f.height for f in frames)) + 10), "white"
             )
@@ -3606,9 +3197,16 @@ class petpet(PBF):
                 frame.paste(f, (0, current_h), alpha=True)
                 current_h += f.height
             return frame
-    
+
         return self.make_jpg_or_gif(img, make)
-    
+
+    @RegCmd(
+        name="啃 ",
+        usage="啃 <QQ号或@对方>",
+        permission="anyone",
+        description="啃",
+        mode="表  情  包"
+    )
     def bite(self):
         img = self.GetImage().convert("RGBA").square()
         frames: List[IMG] = []
@@ -3627,13 +3225,27 @@ class petpet(PBF):
             frame = self.load_image(f"bite/{i}.png")
             frames.append(frame.image)
         return self.save_gif(frames, 0.07)
-    
+
+    @RegCmd(
+        name="出警 ",
+        usage="出警 <QQ号或@对方>",
+        permission="anyone",
+        description="出警",
+        mode="表  情  包"
+    )
     def police(self):
         img = self.GetImage().convert("RGBA").square().resize((245, 245))
         frame = self.load_image("police/0.png")
         frame.paste(img, (224, 46), below=True)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="问问 ",
+        usage="问问 <QQ号或@对方>",
+        permission="anyone",
+        description="问问",
+        mode="表  情  包"
+    )
     def ask(self):
         img = self.GetImage().resize_width(640)
         img_w, img_h = img.size
@@ -3647,15 +3259,15 @@ class petpet(PBF):
         mask.paste(gradient_img, (0, img_h - gradient_h), alpha=True)
         mask = mask.filter(ImageFilter.GaussianBlur(radius=3))
         img.paste(mask, alpha=True)
-    
+
         userid = self.data.message
         if 'at' in userid:
             userid = CQCode(userid).get("qq")[0]
-        
+
         userinfo = self.GetUserInfo(userid)
         name = userinfo.get('nickname')
         ta = "他" if userinfo.get('sex') == "male" else "她"
-    
+
         start_w = 20
         start_h = img_h - gradient_h + 5
         text_img1 = Text2Image.from_text(f"{name}", 28, fill="orange", weight="bold").to_image()
@@ -3672,14 +3284,14 @@ class petpet(PBF):
             (start_w + 40, start_h + text_img1.height + 10),
             alpha=True,
         )
-    
+
         line_h = start_h + text_img1.height + 5
         img.draw_line(
             (start_w, line_h, start_w + text_img2.width + 80, line_h),
             fill="orange",
             width=2,
         )
-    
+
         sep_w = 30
         sep_h = 80
         frame = BuildImage.new("RGBA", (img_w + sep_w * 2, img_h + sep_h * 2), "white")
@@ -3700,17 +3312,31 @@ class petpet(PBF):
             return self.send(NAME_TOO_LONG)
         frame.paste(img, (sep_w, sep_h))
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="舔 ",
+        usage="舔 <QQ号或@对方>",
+        permission="anyone",
+        description="舔",
+        mode="表  情  包"
+    )
     def prpr(self):
         frame = self.load_image("prpr/0.png")
-    
+
         def make(img: BuildImage) -> BuildImage:
             points = ((0, 19), (236, 0), (287, 264), (66, 351))
             screen = img.resize((330, 330), keep_ratio=True).perspective(points)
             return frame.copy().paste(screen, (56, 284), below=True)
-    
+
         return self.make_jpg_or_gif(self.GetImage(), make)
-    
+
+    @RegCmd(
+        name="搓 ",
+        usage="搓 <QQ号或@对方>",
+        permission="anyone",
+        description="搓",
+        mode="表  情  包"
+    )
     def twist(self):
         img = self.GetImage().convert("RGBA").square().resize((78, 78))
         # fmt: off
@@ -3726,26 +3352,39 @@ class petpet(PBF):
             frame.paste(img.rotate(a), (x, y), below=True)
             frames.append(frame.image)
         return self.save_gif(frames, 0.1)
-    
+
+    @RegCmd(
+        name="墙纸 ",
+        usage="墙纸 <QQ号或@对方>",
+        permission="anyone",
+        description="墙纸",
+        mode="表  情  包"
+    )
     def wallpaper(self):
         frame = self.load_image("wallpaper/0.png")
-    
+
         def make(img: BuildImage) -> BuildImage:
             return frame.copy().paste(
                 img.resize((775, 496), keep_ratio=True), (260, 580), below=True
             )
-    
+
         return self.make_jpg_or_gif(self.GetImage(), make, gif_zoom=0.5)
-    
-    
+
     def china_flag(self):
         frame = self.load_image("china_flag/0.png")
         frame.paste(self.GetImage().convert("RGBA").resize(frame.size, keep_ratio=True), below=True)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="交个朋友 ",
+        usage="交个朋友 <QQ号或@对方>",
+        permission="anyone",
+        description="交个朋友",
+        mode="表  情  包"
+    )
     def make_friend(self):
         img = self.GetImage().convert("RGBA")
-    
+
         bg = self.load_image("make_friend/0.png")
         frame = img.resize_width(1000)
         frame.paste(
@@ -3759,40 +3398,61 @@ class petpet(PBF):
             alpha=True,
         )
         frame.paste(bg, (0, frame.height - 1000), alpha=True)
-    
+
         userid = self.data.message
         if 'at' in userid:
             userid = CQCode(userid).get("qq")[0]
-        
+
         name = self.GetUserInfo(userid).get('nickname')
         text_img = Text2Image.from_text(name, 20, fill="white").to_image()
         if text_img.width > 230:
             return self.client.msg().raw(NAME_TOO_LONG)
-    
+
         text_img = BuildImage(text_img).rotate(9, expand=True)
         frame.paste(text_img, (710, frame.height - 308), alpha=True)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="继续干活 ",
+        usage="继续干活 <QQ号或@对方>",
+        permission="anyone",
+        description="继续干活",
+        mode="表  情  包"
+    )
     def back_to_work(self):
         frame = self.load_image("back_to_work/0.png")
         img = self.GetImage().convert("RGBA").resize((220, 310), keep_ratio=True, direction="north")
         frame.paste(img.rotate(25, expand=True), (56, 32), below=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="完美 ",
+        usage="完美 <QQ号或@对方>",
+        permission="anyone",
+        description="完美",
+        mode="表  情  包"
+    )
     def perfect(self):
         frame = self.load_image("perfect/0.png")
         img = self.GetImage().convert("RGBA").resize((310, 460), keep_ratio=True, inside=True)
         frame.paste(img, (313, 64), alpha=True)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="关注 ",
+        usage="关注 <QQ号或@对方>",
+        permission="anyone",
+        description="关注",
+        mode="表  情  包"
+    )
     def follow(self):
         img = self.GetImage().circle().resize((200, 200))
-    
+
         userid = self.data.message
         if 'at' in userid:
             userid = CQCode(userid).get("qq")[0]
         userinfo = self.GetUserInfo(userid)
-        
+
         ta = "女同" if userinfo.get('sex') == "female" else "男同"
         name = userinfo.get('nickname') or ta
         name_img = Text2Image.from_text(name, 60).to_image()
@@ -3800,19 +3460,33 @@ class petpet(PBF):
         text_width = max(name_img.width, follow_img.width)
         if text_width >= 1000:
             return NAME_TOO_LONG
-    
+
         frame = BuildImage.new("RGBA", (300 + text_width + 50, 300), (255, 255, 255, 0))
         frame.paste(img, (50, 50), alpha=True)
         frame.paste(name_img, (300, 135 - name_img.height), alpha=True)
         frame.paste(follow_img, (300, 145), alpha=True)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="这像画吗 ",
+        usage="这像画吗 <QQ号或@对方>",
+        permission="anyone",
+        description="这像画吗",
+        mode="表  情  包"
+    )
     def paint(self):
         img = self.GetImage().convert("RGBA").resize((117, 135), keep_ratio=True)
         frame = self.load_image("paint/0.png")
         frame.paste(img.rotate(4, expand=True), (95, 107), below=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="震惊 ",
+        usage="震惊 <QQ号或@对方>",
+        permission="anyone",
+        description="震惊",
+        mode="表  情  包"
+    )
     def shock(self):
         img = self.GetImage().convert("RGBA").resize((300, 300))
         frames: List[IMG] = []
@@ -3823,12 +3497,19 @@ class petpet(PBF):
                 .image
             )
         self.save_gif(frames, 0.01)
-    
+
+    @RegCmd(
+        name="典中典 ",
+        usage="典中典 <QQ号或@对方> <附加文字>",
+        permission="anyone",
+        description="典中典",
+        mode="表  情  包"
+    )
     def dianzhongdian(self):
         arg = self.data.args[2]
         if not arg:
             return self.client.msg().raw(REQUIRE_ARG)
-    
+
         trans = self.utils.translator(arg)
         img = self.GetImage().convert("L").resize_width(500)
         text_img1 = BuildImage.new("RGBA", (500, 60))
@@ -3850,13 +3531,20 @@ class petpet(PBF):
             )
         except ValueError:
             return self.client.msg().raw(TEXT_TOO_LONG)
-    
+
         frame = BuildImage.new("RGBA", (500, img.height + 100), "black")
         frame.paste(img, alpha=True)
         frame.paste(text_img1, (0, img.height), alpha=True)
         frame.paste(text_img2, (0, img.height + 60), alpha=True)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="哈哈镜 ",
+        usage="哈哈镜 <QQ号或@对方>",
+        permission="anyone",
+        description="哈哈镜",
+        mode="表  情  包"
+    )
     def funny_mirror(self):
         img = self.GetImage().convert("RGBA").square().resize((500, 500))
         frames: List[IMG] = [img.image]
@@ -3868,8 +3556,14 @@ class petpet(PBF):
             frames.append(new_img.resize((500, 500)).image)
         frames.extend(frames[::-1])
         self.save_gif(frames, 0.05)
-    
-    
+
+    @RegCmd(
+        name="永远爱你 ",
+        usage="永远爱你 <QQ号或@对方>",
+        permission="anyone",
+        description="永远爱你",
+        mode="表  情  包"
+    )
     def love_you(self):
         img = self.GetImage().convert("RGBA").square()
         frames: List[IMG] = []
@@ -3881,14 +3575,21 @@ class petpet(PBF):
             frame.paste(img.resize((w, h)), (x, y), alpha=True).paste(heart, alpha=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.2)
-    
+
+    @RegCmd(
+        name="对称 ",
+        usage="对称 <QQ号或@对方>",
+        permission="anyone",
+        description="对称",
+        mode="表  情  包"
+    )
     def symmetric(self):
         arg = self.data.args[2]
         if arg not in ["上", "下", "左", "右"]:
             return self.client.msg().raw('可选方向：上、下、左、右！')
         img = self.GetImage().convert("RGBA").resize_width(500)
         img_w, img_h = img.size
-    
+
         Mode = namedtuple(
             "Mode", ["method", "frame_size", "size1", "pos1", "size2", "pos2"]
         )
@@ -3926,7 +3627,7 @@ class petpet(PBF):
                 (0, 0),
             ),
         }
-    
+
         mode = modes["left"]
         if arg == "右":
             mode = modes["right"]
@@ -3934,19 +3635,26 @@ class petpet(PBF):
             mode = modes["top"]
         elif arg == "下":
             mode = modes["bottom"]
-    
+
         first = img
         second = img.transpose(mode.method)
         frame = BuildImage.new("RGBA", mode.frame_size)
         frame.paste(first.crop(mode.size1), mode.pos1)
         frame.paste(second.crop(mode.size2), mode.pos2)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="安全感 ",
+        usage="安全感 <QQ号或@对方>",
+        permission="anyone",
+        description="安全感",
+        mode="表  情  包"
+    )
     def safe_sense(self):
         img = self.GetImage().convert("RGBA").resize((215, 343), keep_ratio=True)
         frame = self.load_image(f"safe_sense/0.png")
         frame.paste(img, (215, 135))
-        
+
         text = "你给我的安全感\n远不及Ta的万分之一"
         try:
             frame.draw_text(
@@ -3959,16 +3667,23 @@ class petpet(PBF):
         except ValueError:
             return self.client.msg().raw(TEXT_TOO_LONG)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="永远喜欢 ",
+        usage="永远喜欢 <QQ号或@对方>",
+        permission="anyone",
+        description="永远喜欢",
+        mode="表  情  包"
+    )
     def always_like(self):
         img = self.GetImage().convert("RGBA")
         userid = self.data.message
         if 'at' in userid:
             userid = CQCode(userid).get("qq")[0]
-        
+
         name = self.GetUserInfo(userid).get('nickname')
         text = f"我永远喜欢{name}"
-    
+
         frame = self.load_image(f"always_like/0.png")
         frame.paste(
             img.resize((350, 400), keep_ratio=True, inside=True), (25, 35), alpha=True
@@ -3983,12 +3698,12 @@ class petpet(PBF):
             )
         except ValueError:
             return self.client.msg().raw(NAME_TOO_LONG)
-    
+
         def random_color():
             return random.choice(
                 ["red", "darkorange", "gold", "darkgreen", "blue", "cyan", "purple"]
             )
-    
+
         current_h = 400
         frame.paste(
             img.resize((350, 400), keep_ratio=True, inside=True),
@@ -3996,13 +3711,20 @@ class petpet(PBF):
             alpha=True,
         )
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="采访 ",
+        usage="采访 <QQ号或@对方>",
+        permission="anyone",
+        description="采访",
+        mode="表  情  包"
+    )
     def interview(self):
         self_img = self.load_image("interview/huaji.png")
         user_img = self.GetImage()
         self_img = self_img.convert("RGBA").square().resize((124, 124))
         user_img = user_img.convert("RGBA").square().resize((124, 124))
-    
+
         frame = BuildImage.new("RGBA", (600, 310), "white")
         microphone = self.load_image("interview/microphone.png")
         frame.paste(microphone, (330, 103), alpha=True)
@@ -4015,7 +3737,14 @@ class petpet(PBF):
         except ValueError:
             return self.client.msg().raw(TEXT_TOO_LONG)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="打拳 ",
+        usage="打拳 <QQ号或@对方>",
+        permission="anyone",
+        description="打拳",
+        mode="表  情  包"
+    )
     def punch(self):
         img = self.GetImage().convert("RGBA").square().resize((260, 260))
         frames: List[IMG] = []
@@ -4032,7 +3761,14 @@ class petpet(PBF):
             frame.paste(img, (x, y - 15), alpha=True).paste(fist, alpha=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.03)
-    
+
+    @RegCmd(
+        name="群青 ",
+        usage="群青 <QQ号或@对方>",
+        permission="anyone",
+        description="群青",
+        mode="表  情  包"
+    )
     def cyan(self):
         color = (78, 114, 184)
         frame = self.GetImage().convert("RGB").square().resize((500, 500)).color_mask(color)
@@ -4054,7 +3790,14 @@ class petpet(PBF):
             stroke_fill=color,
         )
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="捣 ",
+        usage="捣 <QQ号或@对方>",
+        permission="anyone",
+        description="捣",
+        mode="表  情  包"
+    )
     def pound(self):
         img = self.GetImage().convert("RGBA").square()
         # fmt: off
@@ -4070,7 +3813,14 @@ class petpet(PBF):
             frame.paste(img.resize((w, h)), (x, y), below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.05)
-    
+
+    @RegCmd(
+        name="捶 ",
+        usage="捶 <QQ号或@对方>",
+        permission="anyone",
+        description="捶某人的头像",
+        mode="表  情  包"
+    )
     def thump(self):
         img = self.GetImage().convert("RGBA").square()
         # fmt: off
@@ -4083,20 +3833,41 @@ class petpet(PBF):
             frame.paste(img.resize((w, h)), (x, y), below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.04)
-    
+
+    @RegCmd(
+        name="需要 ",
+        usage="需要 <QQ号或@对方>",
+        permission="anyone",
+        description="需要",
+        mode="表  情  包"
+    )
     def need(self):
         img = self.GetImage().convert("RGBA").square().resize((115, 115))
         frame = self.load_image("need/0.png")
         frame.paste(img, (327, 232), below=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="捂脸 ",
+        usage="捂脸 <QQ号或@对方>",
+        permission="anyone",
+        description="捂脸",
+        mode="表  情  包"
+    )
     def cover_face(self):
         points = ((15, 15), (448, 0), (445, 456), (0, 465))
         img = self.GetImage().convert("RGBA").square().resize((450, 450)).perspective(points)
         frame = self.load_image("cover_face/0.png")
         frame.paste(img, (120, 150), below=True)
         self.save_and_send(frame)
-        
+
+    @RegCmd(
+        name="敲 ",
+        usage="敲 <QQ号或@对方>",
+        permission="anyone",
+        description="敲",
+        mode="表  情  包"
+    )
     def knock(self):
         img = self.GetImage().convert("RGBA").square()
         # fmt: off
@@ -4110,14 +3881,21 @@ class petpet(PBF):
             frame.paste(img.resize((w, h)), (x, y), below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.04)
-    
+
+    @RegCmd(
+        name="垃圾 ",
+        usage="垃圾 <QQ号或@对方>",
+        permission="anyone",
+        description="垃圾",
+        mode="表  情  包"
+    )
     def garbage(self):
         img = self.GetImage().convert("RGBA").square().resize((79, 79))
         # fmt: off
         locs = (
-            [] + [(39, 40)] * 3 + [(39, 30)] * 2 + [(39, 32)] * 10
-            + [(39, 30), (39, 27), (39, 32), (37, 49), (37, 64),
-               (37, 67), (37, 67), (39, 69), (37, 70), (37, 70)]
+                [] + [(39, 40)] * 3 + [(39, 30)] * 2 + [(39, 32)] * 10
+                + [(39, 30), (39, 27), (39, 32), (37, 49), (37, 64),
+                   (37, 67), (37, 67), (39, 69), (37, 70), (37, 70)]
         )
         # fmt: on
         frames: List[IMG] = []
@@ -4126,22 +3904,40 @@ class petpet(PBF):
             frame.paste(img, locs[i], below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.04)
-    
-    
+
+    @RegCmd(
+        name="为什么@我 ",
+        usage="为什么@我 <QQ号或@对方>",
+        permission="anyone",
+        description="为什么@我",
+        mode="表  情  包"
+    )
     def whyatme(self):
         img = self.GetImage().convert("RGBA").resize((265, 265), keep_ratio=True)
         frame = self.load_image("whyatme/0.png")
         frame.paste(img, (42, 13), below=True)
         self.save_and_send(frame)
-    
-    
+
+    @RegCmd(
+        name="像样的亲亲 ",
+        usage="像样的亲亲 <QQ号或@对方>",
+        permission="anyone",
+        description="像样的亲亲",
+        mode="表  情  包"
+    )
     def decent_kiss(self):
         img = self.GetImage().convert("RGBA").resize((589, 340), keep_ratio=True)
         frame = self.load_image("decent_kiss/0.png")
         frame.paste(img, (0, 91), below=True)
         self.save_and_send(frame)
-    
-    
+
+    @RegCmd(
+        name="啾啾 ",
+        usage="啾啾 <QQ号或@对方>",
+        permission="anyone",
+        description="啾啾",
+        mode="表  情  包"
+    )
     def jiujiu(self):
         img = self.GetImage().convert("RGBA").resize((75, 51), keep_ratio=True)
         frames: List[IMG] = []
@@ -4150,8 +3946,14 @@ class petpet(PBF):
             frame.paste(img, below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.06)
-    
-    
+
+    @RegCmd(
+        name="吸 ",
+        usage="吸 <QQ号或@对方>",
+        permission="anyone",
+        description="吸",
+        mode="表  情  包"
+    )
     def suck(self):
         img = self.GetImage().convert("RGBA").square()
         # fmt: off
@@ -4167,8 +3969,14 @@ class petpet(PBF):
             frame.paste(img.resize((w, h)), (x, y), alpha=True).paste(bg, alpha=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.08)
-    
-    
+
+    @RegCmd(
+        name="锤 ",
+        usage="锤 <QQ号或@对方>",
+        permission="anyone",
+        description="锤",
+        mode="表  情  包"
+    )
     def hammer(self):
         img = self.GetImage().convert("RGBA").square()
         # fmt: off
@@ -4182,13 +3990,21 @@ class petpet(PBF):
             frame.paste(img.resize((w, h)), (x, y), below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.07)
-    
-    
+
+    @RegCmd(
+        name="紧贴 ",
+        usage="紧贴 <QQ号或@对方>",
+        permission="anyone",
+        description="紧贴",
+        mode="表  情  包"
+    )
     def tightly(self):
         img = self.GetImage().convert("RGBA").resize((640, 400), keep_ratio=True)
         # fmt: off
-        locs = [(39, 169, 267, 141), (40, 167, 264, 143), (38, 174, 270, 135), (40, 167, 264, 143), (38, 174, 270, 135),
-                (40, 167, 264, 143), (38, 174, 270, 135), (40, 167, 264, 143), (38, 174, 270, 135), (28, 176, 293, 134),
+        locs = [(39, 169, 267, 141), (40, 167, 264, 143), (38, 174, 270, 135), (40, 167, 264, 143),
+                (38, 174, 270, 135),
+                (40, 167, 264, 143), (38, 174, 270, 135), (40, 167, 264, 143), (38, 174, 270, 135),
+                (28, 176, 293, 134),
                 (5, 215, 333, 96), (10, 210, 321, 102), (3, 210, 330, 104), (4, 210, 328, 102), (4, 212, 328, 100),
                 (4, 212, 328, 100), (4, 212, 328, 100), (4, 212, 328, 100), (4, 212, 328, 100), (29, 195, 285, 120)]
         # fmt: on
@@ -4199,15 +4015,28 @@ class petpet(PBF):
             frame.paste(img.resize((w, h)), (x, y), below=True)
             frames.append(frame.image)
         self.save_gif(frames, 0.08)
-    
-    
+
+    @RegCmd(
+        name="注意力涣散 ",
+        usage="注意力涣散 <QQ号或@对方>",
+        permission="anyone",
+        description="注意力涣散",
+        mode="表  情  包"
+    )
     def distracted(self):
         img = self.GetImage().convert("RGBA").square().resize((500, 500))
         frame = self.load_image("distracted/1.png")
         label = self.load_image("distracted/0.png")
         frame.paste(img, below=True).paste(label, (140, 320), alpha=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="结婚申请 ",
+        usage="结婚申请 <QQ号或@对方>",
+        permission="anyone",
+        description="结婚申请",
+        mode="表  情  包"
+    )
     def marriage(self):
         img = self.GetImage().convert("RGBA").resize_height(1080)
         img_w, img_h = img.size
@@ -4223,17 +4052,31 @@ class petpet(PBF):
             right, (frame.width - right.width, 0), alpha=True
         )
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="想什么 ",
+        usage="想什么 <QQ号或@对方>",
+        permission="anyone",
+        description="想什么",
+        mode="表  情  包"
+    )
     def thinkwhat(self):
         frame = self.load_image("thinkwhat/0.png")
-    
+
         def make(img: BuildImage) -> BuildImage:
             return frame.copy().paste(
                 img.resize((534, 493), keep_ratio=True), (530, 0), below=True
             )
-    
+
         return self.make_jpg_or_gif(self.GetImage(), make)
-    
+
+    @RegCmd(
+        name="阿尼亚喜欢 ",
+        usage="阿尼亚喜欢 <QQ号或@对方>",
+        permission="anyone",
+        description="阿尼亚喜欢",
+        mode="表  情  包"
+    )
     def anyasuki(self):
         frame = self.load_image("anyasuki/0.png")
         try:
@@ -4247,29 +4090,37 @@ class petpet(PBF):
             )
         except ValueError:
             return self.client.msg().raw(TEXT_TOO_LONG)
-    
+
         def make(img: BuildImage) -> BuildImage:
             return frame.copy().paste(
                 img.resize((305, 235), keep_ratio=True), (106, 72), below=True
             )
-    
+
         return self.make_jpg_or_gif(self.GetImage(), make)
-    
+
+    @RegCmd(
+        name="远离 ",
+        usage="远离 <QQ号或@对方>",
+        permission="anyone",
+        description="远离",
+        mode="表  情  包"
+    )
     def keepaway(self):
         imgs = [self.GetImage()]
+
         def trans(img: BuildImage, n: int) -> BuildImage:
             img = img.convert("RGBA").square().resize((100, 100))
             if n < 4:
                 return img.rotate(n * 90)
             else:
                 return img.transpose(Image.FLIP_LEFT_RIGHT).rotate((n - 4) * 90)
-    
+
         def paste(img: BuildImage):
             nonlocal count
             y = 90 if count < 4 else 190
             frame.paste(img, ((count % 4) * 100, y))
             count += 1
-    
+
         frame = BuildImage.new("RGB", (400, 290), "white")
         frame.draw_text(
             (10, 10, 220, 80), "如何提高社交质量 : \n远离以下头像的人", max_fontsize=21, halign="left"
@@ -4282,22 +4133,37 @@ class petpet(PBF):
         num_left = 8 - num_per_user * len(imgs)
         for n in range(num_left):
             paste(trans(imgs[-1], n + num_per_user))
-    
+
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="小画家 ",
+        usage="小画家 <QQ号或@对方>",
+        permission="anyone",
+        description="小画家",
+        mode="表  情  包"
+    )
     def painter(self):
         img = self.GetImage().convert("RGBA").resize((240, 345), keep_ratio=True)
         frame = self.load_image("painter/0.png")
         frame.paste(img, (125, 91), below=True)
         self.save_and_send(frame)
-    
+
+    @RegCmd(
+        name="救命啊 ",
+        usage="救命啊 <QQ号或@对方>",
+        permission="anyone",
+        description="重复 救命啊！",
+        mode="表  情  包"
+    )
     def repeat(self):
         users = [self.GetImage()]
         userid = self.data.message
         if 'at' in userid:
             userid = CQCode(userid).get("qq")[0]
-        
+
         username = self.GetUserInfo(userid).get('nickname')
+
         def single_msg(img: BuildImage) -> BuildImage:
             user_img = img.convert("RGBA").circle().resize((100, 100))
             user_name_img = Text2Image.from_text(f"{username}", 40).to_image()
@@ -4309,26 +4175,27 @@ class petpet(PBF):
             bg.paste(time_img, (200 + user_name_img.width, 50), alpha=True)
             bg.paste(text_img, (175, 100), alpha=True)
             return bg
-    
+
         text = "救命啊"
         text_img = Text2Image.from_text(text, 50).to_image()
-    
+
         msg_img = BuildImage.new("RGB", (1079, 1000))
         for i in range(5):
             index = i % len(users)
             msg_img.paste(single_msg(users[index]), (0, 200 * i))
         msg_img_twice = BuildImage.new("RGB", (msg_img.width, msg_img.height * 2))
         msg_img_twice.paste(msg_img).paste(msg_img, (0, msg_img.height))
-    
+
         input_img = self.load_image("repeat/0.jpg")
-        self_img = self.GetImage({'message':str(self.data.se.get('user_id'))}).convert("RGBA").circle().resize((75, 75))
+        self_img = self.GetImage({'message': str(self.data.se.get('user_id'))}).convert("RGBA").circle().resize(
+            (75, 75))
         input_img.paste(self_img, (15, 40), alpha=True)
-    
+
         frames: List[IMG] = []
         for i in range(50):
             frame = BuildImage.new("RGB", (1079, 1192), "white")
             frame.paste(msg_img_twice, (0, -20 * i))
             frame.paste(input_img, (0, 1000))
             frames.append(frame.image)
-    
+
         self.save_gif(frames, 0.08)
